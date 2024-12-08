@@ -736,8 +736,7 @@ in {
     systemd.services.linger-users = let
       lingerDir = "/var/lib/systemd/linger";
       lingeringUsersFile = builtins.toFile "lingering-users"
-        (concatStrings (map (s: "${s}\n")
-          (sort (a: b: a < b) lingeringUsers)));  # this sorting is important for `comm` to work correctly
+        (concatStrings (map (s: "${s}\n") lingeringUsers));
     in {
       wantedBy = ["multi-user.target"];
       after = ["systemd-logind.service"];
@@ -748,17 +747,51 @@ in {
         ConditionDirectoryNotEmpty = "|" + lingerDir;
       };
 
+      environment.LINGERING_USERS_FILE = lingeringUsersFile;
+
       script = ''
+        list_contains () {
+            local -n list="$1"
+            local value="$2"
+            local i
+            for i in "''${list[@]}"; do
+                [[ "$i" = "$value" ]] && return 0
+            done
+            return 1
+        }
+
+        mapfile -t desired_lingering_users <"$LINGERING_USERS_FILE"
+
         mkdir -vp ${lingerDir}
         cd ${lingerDir}
-        for user in $(ls); do
-          if ! id "$user" >/dev/null; then
-            echo "Removing linger for missing user $user"
-            rm --force -- "$user"
-          fi
+
+        shopt -s dotglob nullglob
+        lingering_users=(*)
+
+        for user in "''${lingering_users[@]}"; do
+            if list_contains desired_lingering_users "$user"; then
+                # User is both desired to linger and already set to linger, so
+                # nothing to do.
+                :
+            elif ! id "$user" >/dev/null; then
+                echo "Removing linger for missing user $user"
+                rm --force -- "$user"
+            else
+                echo "Removing linger for user $user"
+                ${pkgs.systemd}/bin/loginctl disable-linger "$user"
+            fi
         done
-        ls | sort | comm -3 -1 ${lingeringUsersFile} - | xargs -r ${pkgs.systemd}/bin/loginctl disable-linger
-        ls | sort | comm -3 -2 ${lingeringUsersFile} - | xargs -r ${pkgs.systemd}/bin/loginctl  enable-linger
+
+        for user in "''${desired_lingering_users[@]}"; do
+            if list_contains lingering_users "$user"; then
+                # User is both desired to linger and already set to linger, so
+                # nothing to do.
+                :
+            else
+                echo "Adding linger for user $user"
+                ${pkgs.systemd}/bin/loginctl enable-linger "$user"
+            fi
+        done
       '';
 
       serviceConfig.Type = "oneshot";
