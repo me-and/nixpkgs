@@ -733,17 +733,22 @@ in {
       '';
     } else ""; # keep around for backwards compatibility
 
-    systemd.services.linger-users = lib.mkIf ((length lingeringUsers) > 0) {
+    systemd.services.linger-users = let
+      lingerDir = "/var/lib/systemd/linger";
+      lingeringUsersFile = builtins.toFile "lingering-users"
+        (concatStrings (map (s: "${s}\n")
+          (sort (a: b: a < b) lingeringUsers)));  # this sorting is important for `comm` to work correctly
+    in {
       wantedBy = ["multi-user.target"];
       after = ["systemd-logind.service"];
       requires = ["systemd-logind.service"];
 
-      script = let
-        lingerDir = "/var/lib/systemd/linger";
-        lingeringUsersFile = builtins.toFile "lingering-users"
-          (concatStrings (map (s: "${s}\n")
-            (sort (a: b: a < b) lingeringUsers)));  # this sorting is important for `comm` to work correctly
-      in ''
+      unitConfig = {
+        ConditionFileNotEmpty = "|" + lingeringUsersFile;
+        ConditionDirectoryNotEmpty = "|" + lingerDir;
+      };
+
+      script = ''
         mkdir -vp ${lingerDir}
         cd ${lingerDir}
         for user in $(ls); do
