@@ -1,7 +1,18 @@
-import ./make-test-python.nix (
-  { lib, ... }:
-  rec {
-    name = "systemd-user-linger";
+{
+  system ? builtins.currentSystem,
+  pkgs ? import ../.. {
+    inherit system;
+    config = { };
+    overlays = [ ];
+  },
+  ...
+}@args:
+
+with import ../lib/testing-python.nix { inherit system pkgs; };
+
+{
+  systemd-user-linger-setup = makeTest rec {
+    name = "systemd-user-linger-setup";
 
     nodes.machine = {
       users.users = {
@@ -29,11 +40,18 @@ import ./make-test-python.nix (
 
         machine.fail("test -e /var/lib/systemd/linger/bob")
         machine.fail("systemctl status user-${uidStrings.bob}.slice")
-
-        with subtest("missing users have linger purged"):
-            machine.succeed("touch /var/lib/systemd/linger/missing")
-            machine.systemctl("restart linger-users")
-            machine.succeed("test ! -e /var/lib/systemd/linger/missing")
       '';
-  }
-)
+  };
+
+  systemd-user-linger-cleanup = makeTest {
+    name = "systemd-user-linger-cleanup";
+
+    nodes.machine = { };
+
+    testScript = ''
+      machine.succeed("touch /var/lib/systemd/linger/missing")
+      machine.systemctl("restart linger-users")
+      machine.succeed("test ! -e /var/lib/systemd/linger/missing")
+    '';
+  };
+}
