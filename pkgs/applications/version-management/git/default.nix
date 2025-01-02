@@ -2,7 +2,9 @@
 , curl, openssl, zlib, expat, perlPackages, python3, gettext, cpio
 , gnugrep, gnused, gawk, coreutils # needed at runtime by git-filter-branch etc
 , openssh, pcre2, bash
-, asciidoc, texinfo, xmlto, docbook2x, docbook_xsl, docbook_xml_dtd_45
+, asciidoctor, texinfo, xmlto, docbook2x, docbook_xsl, docbook_xml_dtd_45
+, findXMLCatalogs
+, docbook_xsl_ns
 , libxslt, tcl, tk, makeWrapper, libiconv, libiconvReal
 , svnSupport ? false, subversionClient, perlLibs, smtpPerlLibs
 , perlSupport ? stdenv.buildPlatform == stdenv.hostPlatform
@@ -36,6 +38,7 @@ let
 in
 
 stdenv.mkDerivation (finalAttrs: {
+  __noChroot = true;
   pname = "git"
     + lib.optionalString svnSupport "-with-svn"
     + lib.optionalString (!svnSupport && !guiSupport && !sendEmailSupport && !withManual && !pythonSupport && !withpcre2) "-minimal";
@@ -86,7 +89,9 @@ stdenv.mkDerivation (finalAttrs: {
   '';
 
   nativeBuildInputs = [ deterministic-host-uname gettext perlPackages.perl makeWrapper pkg-config ]
-    ++ lib.optionals withManual [ asciidoc texinfo xmlto docbook2x
+    ++ lib.optionals withManual [ asciidoctor texinfo xmlto docbook2x
+  findXMLCatalogs
+  docbook_xsl_ns
          docbook_xsl docbook_xml_dtd_45 libxslt ];
   buildInputs = [ curl openssl zlib expat cpio (if stdenv.hostPlatform.isFreeBSD then libiconvReal else libiconv) bash ]
     ++ lib.optionals perlSupport [ perlPackages.perl ]
@@ -107,8 +112,11 @@ stdenv.mkDerivation (finalAttrs: {
     "ac_cv_iconv_omits_bom=no"
   ];
 
+  # TODO Why does using `export USE_ASCIIDOCTOR=YesPlease` work here, but not
+  # in makeFlags?
   preBuild = ''
     makeFlagsArray+=( perllibdir=$out/$(perl -MConfig -wle 'print substr $Config{installsitelib}, 1 + length $Config{siteprefixexp}') )
+    export USE_ASCIIDOCTOR=YesPlease
   '';
 
   makeFlags = [
