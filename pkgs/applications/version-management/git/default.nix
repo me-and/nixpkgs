@@ -28,6 +28,7 @@
 assert osxkeychainSupport -> stdenv.hostPlatform.isDarwin;
 assert sendEmailSupport -> perlSupport;
 assert svnSupport -> perlSupport;
+assert withManual -> perlSupport;
 
 let
   version = "2.48.1";
