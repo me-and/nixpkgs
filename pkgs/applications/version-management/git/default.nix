@@ -24,17 +24,20 @@
 , doInstallCheck ? !stdenv.hostPlatform.isDarwin  # extremely slow on darwin
 , doExpensiveChecks ? false
 , doGPGChecks ? false, gnupg # must not be set for gitMinimal to avoid infinite recursion
+, doCVSChecks ? false, cvs, cvsps
 , tests
 }:
 
 assert osxkeychainSupport -> stdenv.hostPlatform.isDarwin;
 assert sendEmailSupport -> perlSupport;
 assert svnSupport -> perlSupport;
+assert doCVSChecks -> perlSupport;
 
 let
   version = "2.49.0-rc1";
   svn = subversionClient.override { perlBindings = perlSupport; };
   gitwebPerlLibs = with perlPackages; [ CGI HTMLParser CGIFast FCGI FCGIProcManager HTMLTagCloud ];
+  sqlPerlLibs = with perlPackages; [ DBI DBDSQLite ];
 in
 
 stdenv.mkDerivation (finalAttrs: {
@@ -331,7 +334,7 @@ stdenv.mkDerivation (finalAttrs: {
   ]
   ++ lib.optional doExpensiveChecks "GIT_TEST_CLONE_2GB=true";
 
-  nativeInstallCheckInputs = lib.optional doGPGChecks gnupg ++ lib.optional (stdenv.hostPlatform.isDarwin || stdenv.hostPlatform.isFreeBSD) sysctl;
+  nativeInstallCheckInputs = lib.optionals doCVSChecks [cvs cvsps sqlPerlLibs] ++ lib.optional doGPGChecks gnupg ++ lib.optional (stdenv.hostPlatform.isDarwin || stdenv.hostPlatform.isFreeBSD) sysctl;
 
   preInstallCheck = ''
     installCheckFlagsArray+=(
