@@ -409,6 +409,7 @@ stdenv.mkDerivation (finalAttrs: {
         doInstallCheck = true;
         doExpensiveChecks = true;
         doGPGChecks = true;
+        doCVSChecks = true;
       });
       buildbot-integration = nixosTests.buildbot;
     } // tests.fetchgit;
