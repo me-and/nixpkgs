@@ -22,6 +22,7 @@
 , sysctl
 , deterministic-host-uname # trick Makefile into targeting the host platform when cross-compiling
 , doInstallCheck ? !stdenv.hostPlatform.isDarwin  # extremely slow on darwin
+, doExpensiveChecks ? false
 , tests
 }:
 
@@ -326,7 +327,8 @@ stdenv.mkDerivation (finalAttrs: {
   installCheckFlags = [
     "DEFAULT_TEST_TARGET=prove"
     "PERL_PATH=${buildPackages.perl}/bin/perl"
-  ];
+  ]
+  ++ lib.optional doExpensiveChecks "GIT_TEST_CLONE_2GB=true";
 
   nativeInstallCheckInputs = lib.optional (stdenv.hostPlatform.isDarwin || stdenv.hostPlatform.isFreeBSD) sysctl;
 
@@ -398,6 +400,7 @@ stdenv.mkDerivation (finalAttrs: {
     tests = {
       withInstallCheck = finalAttrs.finalPackage.overrideAttrs (_: {
         doInstallCheck = true;
+        doExpensiveChecks = true;
       });
       buildbot-integration = nixosTests.buildbot;
     } // tests.fetchgit;
