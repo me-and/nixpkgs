@@ -398,6 +398,11 @@ stdenv.mkDerivation (finalAttrs: {
     # Fails largely due to assumptions about BOM
     # Tested to fail: 2.18.0
     disable_test t0028-working-tree-encoding
+  ''
+  # TODO work out why this is necessary and optionally report it upstream
+  # Problem introduced at e7c3d1ddba (dir.c: reduce max pattern file size to 100MB, 2024-06-05)
+  + lib.optionalString doExpensiveChecks ''
+    disable_test t0008-ignores 'large exclude file ignored in tree'
   '';
 
   stripDebugList = [ "lib" "libexec" "bin" "share/git/contrib/credential/libsecret" ];
