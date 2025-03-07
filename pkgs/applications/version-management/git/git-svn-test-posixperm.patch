@@ -1,0 +1,13 @@
+diff --git a/t/t9100-git-svn-basic.sh b/t/t9100-git-svn-basic.sh
+index af28b01fef..676500beb7 100755
+--- a/t/t9100-git-svn-basic.sh
++++ b/t/t9100-git-svn-basic.sh
+@@ -142,7 +142,7 @@ test_expect_success POSIXPERM "$name" '
+ 
+ 
+ name='executable file becomes a symlink to file'
+-test_expect_success SYMLINKS "$name" '
++test_expect_success POSIXPERM,SYMLINKS "$name" '
+ 	rm exec.sh &&
+ 	ln -s file exec.sh &&
+ 	git update-index exec.sh &&
