@@ -335,7 +335,7 @@ stdenv.mkDerivation (finalAttrs: {
     "DEFAULT_TEST_TARGET=prove"
     "PERL_PATH=${buildPackages.perl}/bin/perl"
   ]
-  ++ lib.optional doExpensiveChecks "GIT_TEST_CLONE_2GB=true";
+  ++ lib.optionals doExpensiveChecks ["GIT_TEST_CLONE_2GB=true" "GIT_TEST_LONG=true"];
 
   nativeInstallCheckInputs = lib.optionals doCVSChecks [cvs cvsps sqlPerlLibs] ++ lib.optional svnSupport svn ++ lib.optional doGPGChecks gnupg ++ lib.optional (stdenv.hostPlatform.isDarwin || stdenv.hostPlatform.isFreeBSD) sysctl;
 
