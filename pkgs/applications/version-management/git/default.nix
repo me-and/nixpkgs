@@ -23,6 +23,7 @@
 , deterministic-host-uname # trick Makefile into targeting the host platform when cross-compiling
 , doInstallCheck ? !stdenv.hostPlatform.isDarwin  # extremely slow on darwin
 , doExpensiveChecks ? false
+, doGPGChecks ? false, gnupg # must not be set for gitMinimal to avoid infinite recursion
 , tests
 }:
 
@@ -330,7 +331,7 @@ stdenv.mkDerivation (finalAttrs: {
   ]
   ++ lib.optional doExpensiveChecks "GIT_TEST_CLONE_2GB=true";
 
-  nativeInstallCheckInputs = lib.optional (stdenv.hostPlatform.isDarwin || stdenv.hostPlatform.isFreeBSD) sysctl;
+  nativeInstallCheckInputs = lib.optional doGPGChecks gnupg ++ lib.optional (stdenv.hostPlatform.isDarwin || stdenv.hostPlatform.isFreeBSD) sysctl;
 
   preInstallCheck = ''
     installCheckFlagsArray+=(
@@ -401,6 +402,7 @@ stdenv.mkDerivation (finalAttrs: {
       withInstallCheck = finalAttrs.finalPackage.overrideAttrs (_: {
         doInstallCheck = true;
         doExpensiveChecks = true;
+        doGPGChecks = true;
       });
       buildbot-integration = nixosTests.buildbot;
     } // tests.fetchgit;
