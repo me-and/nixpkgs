@@ -51,7 +51,7 @@
   deterministic-host-uname, # trick Makefile into targeting the host platform when cross-compiling
   doInstallCheck ? !stdenv.hostPlatform.isDarwin, # extremely slow on darwin
   tests,
-  rustSupport ? true,
+  rustSupport ? null,
   cargo,
   rustc,
 }:
@@ -61,6 +61,15 @@ assert sendEmailSupport -> perlSupport;
 assert svnSupport -> perlSupport;
 
 let
+  rustSupport' =
+    if rustSupport == null then
+      if builtins.elem stdenv.hostPlatform.system rustc.meta.platforms then
+        true
+      else
+        lib.warn "future versions of git will require rust, which is not currently supported by Nixpkgs on this platform" false
+    else
+      rustSupport;
+
   version = "2.52.0";
   svn = subversionClient.override { perlBindings = perlSupport; };
   gitwebPerlLibs = with perlPackages; [
@@ -177,7 +186,7 @@ stdenv.mkDerivation (finalAttrs: {
     docbook_xml_dtd_45
     libxslt
   ]
-  ++ lib.optionals rustSupport [
+  ++ lib.optionals rustSupport' [
     cargo
     rustc
   ];
@@ -248,7 +257,7 @@ stdenv.mkDerivation (finalAttrs: {
   # See https://github.com/Homebrew/homebrew-core/commit/dfa3ccf1e7d3901e371b5140b935839ba9d8b706
   ++ lib.optional stdenv.hostPlatform.isDarwin "TKFRAMEWORK=/nonexistent"
   # Starting with future Git version 3.0.0, rust will be mandatory. For now, it's optional.
-  ++ lib.optional rustSupport "WITH_RUST=YesPlease";
+  ++ lib.optional rustSupport' "WITH_RUST=YesPlease";
 
   disallowedReferences = lib.optionals (stdenv.buildPlatform != stdenv.hostPlatform) [
     stdenv.shellPackage
