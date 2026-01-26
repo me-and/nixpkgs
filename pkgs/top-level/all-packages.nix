@@ -1147,6 +1147,7 @@ with pkgs;
     osxkeychainSupport = false;
     pythonSupport = false;
     perlSupport = false;
+    rustSupport = false;
     withpcre2 = false;
   };
 
