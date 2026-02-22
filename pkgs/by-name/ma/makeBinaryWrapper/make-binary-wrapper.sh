@@ -65,11 +65,22 @@ wrapProgramBinary() {
 
     assertExecutable "$prog"
 
-    hidden="$(dirname "$prog")/.$(basename "$prog")"-wrapped
-    while [ -e "$hidden" ]; do
-      hidden="${hidden}_"
+    progdirname="${prog%/*}"
+    progbasename="${prog##*/}"
+    [[ "$progdirname"/"$progbasename" = "$prog" ]] || die "prog name processing failed: $prog"
+
+    if [[ "$progdirname" = */bin ]]; then destdir="${progdirname%/bin}/libexec"
+    elif [[ "$progdirname" = */sbin ]]; then destdir="${progdirname%/sbin}/libexec"
+    else die "prog not in /bin or /sbin: $prog"
+    fi
+
+    hidden="$destdir"/"$progbasename"
+    while [[ -e "$hidden" ]]; do
+        hidden="$hidden"-wrapped
     done
-    mv "$prog" "$hidden"
+
+    mkdir -p -- "$destdir"
+    mv -- "$prog" "$hidden"
     makeBinaryWrapper "$hidden" "$prog" --inherit-argv0 "${@:2}"
 }
 
