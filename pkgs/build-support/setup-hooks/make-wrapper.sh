@@ -245,6 +245,7 @@ wrapProgramShell() {
         dest="$dest"-wrapped
     done
 
-    makeShellWrapper "$prog" "$dest" --inherit-argv0 "${@:2}"
-    mv --exchange -- "$prog" "$dest"
+    mkdir -p -- "$destdir"
+    mv -- "$prog" "$dest"
+    makeShellWrapper "$dest" "$prog" --inherit-argv0 "${@:2}"
 }

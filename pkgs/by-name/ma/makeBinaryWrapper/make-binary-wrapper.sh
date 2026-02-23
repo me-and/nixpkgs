@@ -84,8 +84,9 @@ wrapProgramBinary() {
         dest="$dest"-wrapped
     done
 
-    makeBinaryWrapper "$prog" "$dest" --inherit-argv0 "${@:2}"
-    mv --exchange -- "$prog" "$dest"
+    mkdir -p -- "$destdir"
+    mv -- "$prog" "$dest"
+    makeBinaryWrapper "$dest" "$prog" --inherit-argv0 "${@:2}"
 }
 
 # Generate source code for the wrapper in such a way that the wrapper inputs
