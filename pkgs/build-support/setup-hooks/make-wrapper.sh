@@ -222,7 +222,7 @@ filterExisting() {
 wrapProgram() { wrapProgramShell "$@"; }
 wrapProgramShell() {
     local prog="$1"
-    local hidden
+    local progdirname progbasename destdir dest
 
     assertExecutable "$prog"
 
@@ -230,17 +230,21 @@ wrapProgramShell() {
     progbasename="${prog##*/}"
     [[ "$progdirname"/"$progbasename" = "$prog" ]] || die "prog name processing failed: $prog"
 
-    if [[ "$progdirname" = */bin ]]; then destdir="${progdirname%/bin}/libexec"
-    elif [[ "$progdirname" = */sbin ]]; then destdir="${progdirname%/sbin}/libexec"
-    else die "prog not in /bin or /sbin: $prog"
+    if [[ "$progdirname" = */bin ]]; then
+        destdir="${progdirname%/bin}/libexec"
+        dest="$destdir"/"$progbasename"
+    elif [[ "$progdirname" = */sbin ]]; then
+        destdir="${progdirname%/sbin}/libexec"
+        dest="$destdir"/"$progbasename"
+    else
+        destdir="$progdirname"
+        dest="$destdir"/."$progbasename"-wrapped
     fi
 
-    hidden="$destdir"/"$progbasename"
-    while [[ -e "$hidden" ]]; do
-        hidden="$hidden"-wrapped
+    while [[ -e "$dest" ]]; do
+        dest="$dest"-wrapped
     done
 
-    mkdir -p -- "$destdir"
-    mv -- "$prog" "$hidden"
-    makeShellWrapper "$hidden" "$prog" --inherit-argv0 "${@:2}"
+    makeShellWrapper "$prog" "$dest" --inherit-argv0 "${@:2}"
+    mv --exchange -- "$prog" "$dest"
 }
