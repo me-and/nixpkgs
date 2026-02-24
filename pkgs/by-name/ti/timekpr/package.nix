@@ -81,7 +81,7 @@ python3Packages.buildPythonApplication rec {
 
     # The original file name `timekpra` is renamed to `..timekpra-wrapped-wrapped` because `makeCWrapper` was used multiple times.
     substituteInPlace client/admin/adminprocessor.py \
-      --replace-fail '"/timekpra" in ' '"/..timekpra-wrapped-wrapped" in '
+      --replace-fail '"bin/timekpra" in ' '"libexec/timekpra-wrapped" in '
 
     printf %s "$SETUP_PY" > setup.py
   '';

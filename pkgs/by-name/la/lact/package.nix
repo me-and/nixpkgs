@@ -110,7 +110,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
   '';
 
   postFixup = lib.optionalString stdenv.targetPlatform.isElf ''
-    patchelf $out/bin/.lact-wrapped \
+    patchelf $out/libexec/lact \
     --add-needed libvulkan.so \
     --add-needed libdrm.so \
     --add-needed libOpenCL.so \

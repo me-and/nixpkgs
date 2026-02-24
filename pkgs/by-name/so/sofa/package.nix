@@ -76,7 +76,7 @@ stdenv.mkDerivation (finalAttrs: {
     install_name_tool -change \
       $out/lib/libSceneChecking.${finalAttrs.version}.dylib \
       $out/plugins/SceneChecking/lib/libSceneChecking.${finalAttrs.version}.dylib \
-      $out/bin/.runSofa-${finalAttrs.version}-wrapped
+      $out/libexec/runSofa-${finalAttrs.version}
   '';
 
   meta = {

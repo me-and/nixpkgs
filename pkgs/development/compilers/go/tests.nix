@@ -29,7 +29,7 @@ in
 # bin type tests assume ELF file + linux-specific exe types
 // lib.optionalAttrs stdenv.hostPlatform.isLinux {
   skopeo-bin-type = runCommand "skopeo-bin-type" { meta.broken = stdenv.hostPlatform.isStatic; } ''
-    bin="${lib.getExe' skopeo' ".skopeo-wrapped"}"
+    bin="${lib.getBin skopeo'}/libexec/skopeo
     if ! ${lib.getExe' bintools "readelf"} -p .comment $bin | grep -Fq "GCC: (GNU)"; then
       echo "${lib.getExe skopeo} should have been externally linked, but no GNU .comment section found"
       exit 1

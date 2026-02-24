@@ -103,7 +103,7 @@ stdenv.mkDerivation {
   '';
 
   postFixup = ''
-    patchelf --replace-needed libomp.so.5 libomp.so $out/bin/.hqplayer5*-wrapped
+    patchelf --replace-needed libomp.so.5 libomp.so $out/libexec/hqplayer5*
   '';
 
   meta = {

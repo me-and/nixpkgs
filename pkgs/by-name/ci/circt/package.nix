@@ -63,7 +63,7 @@ stdenv.mkDerivation (finalAttrs: {
     (lib.cmakeFeature "MLIR_DIR" "${circt-llvm.dev}/lib/cmake/mlir")
     (lib.cmakeFeature "LLVM_DIR" "${circt-llvm.dev}/lib/cmake/llvm")
     # LLVM_EXTERNAL_LIT is executed by python3, the wrapped bash script will not work
-    (lib.cmakeFeature "LLVM_EXTERNAL_LIT" "${lit}/bin/.lit-wrapped")
+    (lib.cmakeFeature "LLVM_EXTERNAL_LIT" "${lit}/libexec/lit")
     (lib.cmakeBool "CIRCT_SLANG_FRONTEND_ENABLED" enableSlangFrontend)
     (lib.cmakeBool "CIRCT_SLANG_BUILD_FROM_SOURCE" false)
   ];

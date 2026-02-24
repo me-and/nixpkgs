@@ -27,7 +27,7 @@ python3Packages.buildPythonApplication (finalAttrs: {
     mkdir -p "$out/share/unicode"
     ln -s "${unicode-character-database}/share/unicode/UnicodeData.txt" "$out/share/unicode/UnicodeData.txt"
     # We want to keep /usr/share/unicode in the list for the Unihan files
-    substituteInPlace "$out/bin/.unicode-wrapped" \
+    substituteInPlace "$out/libexec/unicode" \
       --replace-fail "'/usr/share/unicode', " "'$out/share/unicode', '/usr/share/unicode', "
   '';
 

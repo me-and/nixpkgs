@@ -75,7 +75,7 @@ stdenv.mkDerivation (finalAttrs: {
   '';
 
   postFixup = ''
-    sed -i "1 a imports.package._findEffectiveEntryPointName = () => 'com.vixalien.sticky';" $out/bin/.com.vixalien.sticky-wrapped
+    sed -i "1 a imports.package._findEffectiveEntryPointName = () => 'com.vixalien.sticky';" $out/libexec/com.vixalien.sticky
   '';
 
   meta = {

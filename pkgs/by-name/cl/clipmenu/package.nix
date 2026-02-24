@@ -34,7 +34,7 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   postFixup = ''
-    sed -i "$out/bin/clipctl" -e 's,clipmenud\$,\.clipmenud-wrapped\$,'
+    sed -i "$out/bin/clipctl" -e 's,bin/clipmenud\$,libexec/clipmenud\$,'
 
     wrapProgram "$out/bin/clipmenu" \
       --prefix PATH : "${lib.makeBinPath [ xsel ]}"

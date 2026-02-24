@@ -41,7 +41,7 @@ stdenv.mkDerivation (finalAttrs: {
     #!/usr/bin/env perl
     \$0 = "cowthink";
     \$ENV{COWPATH} = "\$ENV{COWPATH}" . (\$ENV{COWPATH} ? ":" : "") . "$out/share/cowsay/cows";
-    do "$out/bin/.cowsay-wrapped";
+    do "$out/libexec/cowsay";
     EOF
     chmod +x $out/bin/cowthink
   '';

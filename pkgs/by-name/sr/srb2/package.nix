@@ -92,7 +92,7 @@ stdenv.mkDerivation (finalAttrs: {
       desktopName = name;
       genericName = name;
       categories = [ "Game" ];
-      startupWMClass = ".srb2-wrapped";
+      startupWMClass = "srb2";
     })
   ];
 

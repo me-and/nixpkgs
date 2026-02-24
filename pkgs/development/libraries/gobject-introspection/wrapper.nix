@@ -53,8 +53,8 @@ then
         ${lib.getExe buildPackages.lndir} ${overriddenUnwrappedGir.${output}} ${"$" + "${output}"}
       '') overriddenUnwrappedGir.outputs}
 
-      cp $dev/bin/g-ir-compiler $dev/bin/.g-ir-compiler-wrapped
-      cp $dev/bin/g-ir-scanner $dev/bin/.g-ir-scanner-wrapped
+      cp $dev/bin/g-ir-compiler $dev/libexec/g-ir-compiler
+      cp $dev/bin/g-ir-scanner $dev/libexec/g-ir-scanner
 
       (
         rm "$dev/bin/g-ir-compiler"

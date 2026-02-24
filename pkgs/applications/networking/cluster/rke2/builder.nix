@@ -134,7 +134,7 @@ buildGoModule (finalAttrs: {
   installCheckPhase = ''
     runHook preInstallCheck
     # Verify that the binary uses BoringCrypto
-    go tool nm $out/bin/.rke2-wrapped | grep '_Cfunc__goboringcrypto_' > /dev/null
+    go tool nm $out/libexec/rke2 | grep '_Cfunc__goboringcrypto_' > /dev/null
     runHook postInstallCheck
   '';
   nativeInstallCheckInputs = [ versionCheckHook ];

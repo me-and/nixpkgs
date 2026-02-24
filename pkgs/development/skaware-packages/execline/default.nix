@@ -58,7 +58,7 @@ skawarePackages.buildPackage {
     mv doc $doc/share/doc/execline/html
     mv examples $doc/share/doc/execline/examples
 
-    mv $bin/bin/execlineb $bin/bin/.execlineb-wrapped
+    mv $bin/bin/execlineb $bin/libexec/execlineb
 
     # A wrapper around execlineb, which provides all execline
     # tools on `execlineb`’s PATH.
@@ -68,7 +68,7 @@ skawarePackages.buildPackage {
     $CC \
       -O \
       -Wall -Wpedantic \
-      -D "EXECLINEB_PATH()=\"$bin/bin/.execlineb-wrapped\"" \
+      -D "EXECLINEB_PATH()=\"$bin/libexec/execlineb\"" \
       -D "EXECLINE_BIN_PATH()=\"$bin/bin\"" \
       -I "${skalibs.dev}/include" \
       -L "${skalibs.lib}/lib" \

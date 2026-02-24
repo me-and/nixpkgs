@@ -26,7 +26,7 @@ buildPythonPackage rec {
     substituteInPlace pyunpack/__init__.py \
       --replace-fail \
        '_exepath("patool")' \
-       '"${lib.getBin patool}/bin/.patool-wrapped"'
+       '"${lib.getBin patool}/libexec/patool"'
   '';
 
   nativeBuildInputs = [ setuptools ];

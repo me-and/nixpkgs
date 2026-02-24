@@ -159,8 +159,8 @@ stdenv.mkDerivation rec {
   postInstall = ''
     # Don't use wrapProgram or the wrapper will duplicate the --search
     # arguments every restart
-    mv "$out/bin/awesome" "$out/bin/.awesome-wrapped"
-    makeWrapper "$out/bin/.awesome-wrapped" "$out/bin/awesome" \
+    mv "$out/bin/awesome" "$out/libexec/awesome"
+    makeWrapper "$out/libexec/awesome" "$out/bin/awesome" \
       --set GDK_PIXBUF_MODULE_FILE "$GDK_PIXBUF_MODULE_FILE" \
       --add-flags '--search ${luaEnv}/lib/lua/${lua.luaversion}' \
       --add-flags '--search ${luaEnv}/share/lua/${lua.luaversion}' \

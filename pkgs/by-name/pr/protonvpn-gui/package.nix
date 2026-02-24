@@ -64,7 +64,7 @@ python3Packages.buildPythonApplication (finalAttrs: {
 
     # Fix the desktop file to correctly identify the wrapped app and show the icon during runtime
     substitute ${finalAttrs.src}/rpmbuild/SOURCES/proton.vpn.app.gtk.desktop $out/share/applications/proton.vpn.app.gtk.desktop \
-      --replace-fail "StartupWMClass=protonvpn-app" "StartupWMClass=.protonvpn-app-wrapped"
+      --replace-fail "StartupWMClass=protonvpn-app" "StartupWMClass=protonvpn-app"
     install -Dm 644 ${finalAttrs.src}/rpmbuild/SOURCES/proton-vpn-logo.svg $out/share/pixmaps
   '';
 

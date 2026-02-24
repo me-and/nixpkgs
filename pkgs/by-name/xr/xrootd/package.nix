@@ -103,7 +103,7 @@ stdenv.mkDerivation (finalAttrs: {
   # So far, this xrootd-config script does not seem necessary in $bin
   + ''
     moveToOutput "bin/xrootd-config" "$dev"
-    moveToOutput "bin/.xrootd-config-wrapped" "$dev"
+    moveToOutput "libexec/xrootd-config" "$dev"
   ''
   + lib.optionalString stdenv.hostPlatform.isLinux ''
     mkdir -p "$out/lib/systemd/system"

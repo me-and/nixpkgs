@@ -70,7 +70,7 @@ python3Packages.buildPythonApplication rec {
   '';
 
   postFixup = ''
-    for i in bin/.mate-tweak-wrapped lib/mate-tweak/mate-tweak-helper; do
+    for i in libexec/mate-tweak lib/mate-tweak/mate-tweak-helper; do
       sed -i "s,usr,run/current-system/sw,g" $out/$i
     done
   '';

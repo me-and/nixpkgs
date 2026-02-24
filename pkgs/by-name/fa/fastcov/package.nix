@@ -60,7 +60,7 @@ python3Packages.buildPythonPackage rec {
   '';
 
   postFixup = ''
-    substituteInPlace $out/bin/.fastcov-wrapped \
+    substituteInPlace $out/libexec/fastcov \
       --replace-fail "default='gcov'" "default='${lib.getExe' libgcc.out "gcov"}'"
   '';
 

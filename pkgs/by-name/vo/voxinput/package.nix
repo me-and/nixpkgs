@@ -66,7 +66,7 @@ buildGoModule (finalAttrs: {
   '';
 
   postFixup = lib.optionalString stdenv.hostPlatform.isElf ''
-    patchelf $out/bin/.voxinput-wrapped \
+    patchelf $out/libexec/voxinput \
       --add-rpath ${lib.makeLibraryPath [ libpulseaudio ]}
   '';
 

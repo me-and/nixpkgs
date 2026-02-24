@@ -75,6 +75,9 @@ wrapProgramBinary() {
     elif [[ "$progdirname" = */sbin ]]; then
         destdir="${progdirname%/sbin}/libexec"
         dest="$destdir"/"$progbasename"
+    elif [[ "$progdirname" = */libexec ]]; then
+        destdir="$progdirname"
+        dest="$destdir"/"$progbasename"-wrapped
     else
         destdir="$progdirname"
         dest="$destdir"/."$progbasename"-wrapped

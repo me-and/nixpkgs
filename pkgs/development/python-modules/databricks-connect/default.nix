@@ -35,7 +35,7 @@ buildPythonPackage rec {
 
   preFixup = ''
     substituteInPlace "$out/bin/find-spark-home" \
-      --replace-fail find_spark_home.py .find_spark_home.py-wrapped
+      --replace-fail bin/find_spark_home.py libexec/find_spark_home.py
   '';
 
   pythonImportsCheck = [

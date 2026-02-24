@@ -356,7 +356,7 @@ stdenv'.mkDerivation (finalAttrs: {
   # found. See the explanation in libglvnd.
   postFixup =
     lib.optionalString cudaSupport ''
-      for program in $out/bin/blender $out/bin/.blender-wrapped; do
+      for program in $out/bin/blender $out/libexec/blender; do
         addDriverRunpath "$program"
       done
     ''

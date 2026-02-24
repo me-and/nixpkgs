@@ -56,8 +56,8 @@ let
           rm -rf $out/bin
         ''}
         mkdir -p $out/bin
-        cp $unwrapped/bin/.mbc-wrapped $out/bin/mbc
-        cp $unwrapped/bin/.maubot-wrapped $out/bin/maubot
+        cp $unwrapped/libexec/.mbc $out/bin/mbc
+        cp $unwrapped/libexec/.maubot $out/bin/maubot
         wrapPythonProgramsIn "$out/bin" "${
           lib.optionalString (baseConfig != null) "$out "
         }''${pythonPath[*]}"

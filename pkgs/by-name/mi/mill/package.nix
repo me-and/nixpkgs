@@ -56,9 +56,9 @@ stdenvNoCC.mkDerivation rec {
   installPhase = ''
     runHook preInstall
 
-    install -Dm 555 $src $out/bin/.mill-wrapped
+    install -Dm 555 $src $out/libexec/mill
     # can't use wrapProgram because it sets --argv0
-    makeWrapper $out/bin/.mill-wrapped $out/bin/mill \
+    makeWrapper $out/libexec/mill $out/bin/mill \
       --prefix PATH : "${jre}/bin" \
       --set-default JAVA_HOME "${jre}"
 

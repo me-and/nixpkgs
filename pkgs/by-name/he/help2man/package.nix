@@ -46,12 +46,13 @@ stdenv.mkDerivation (finalAttrs: {
   # We don't use makeWrapper here because it uses substitutions our
   # bootstrap shell can't handle.
   postInstall = ''
-    mv $out/bin/help2man $out/bin/.help2man-wrapped
+    mkdir -p -- "$out"/libexec
+    mv $out/bin/help2man $out/libexec/help2man
     cat > $out/bin/help2man <<EOF
     #! $SHELL -e
     export PERL5LIB=\''${PERL5LIB:+:}${perlPackages.LocaleGettext}/${perlPackages.perl.libPrefix}
     ${lib.optionalString stdenv.hostPlatform.isCygwin ''export PATH=\''${PATH:+:}${gettext}/bin''}
-    exec -a \$0 $out/bin/.help2man-wrapped "\$@"
+    exec -a \$0 $out/libexec/help2man "\$@"
     EOF
     chmod +x $out/bin/help2man
   '';

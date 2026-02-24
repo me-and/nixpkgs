@@ -80,7 +80,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
   '';
 
   postFixup = lib.optionalString stdenv.hostPlatform.isLinux ''
-    patchelf $out/bin/.jumpy-wrapped \
+    patchelf $out/libexec/jumpy \
       --add-rpath ${lib.makeLibraryPath [ vulkan-loader ]}
   '';
 

@@ -82,9 +82,9 @@ stdenv.mkDerivation (finalAttrs: {
       );
     in
     ''
-      mkdir -p $out/bin/ $out/.bin-wrapped
-      mv lnxrouter $out/.bin-wrapped/lnxrouter
-      makeWrapper $out/.bin-wrapped/lnxrouter $out/bin/lnxrouter --prefix PATH : ${binPath}
+      mkdir -p $out/bin/ $out/libexec
+      mv lnxrouter $out/libexec/lnxrouter
+      makeWrapper $out/libexec/lnxrouter $out/bin/lnxrouter --prefix PATH : ${binPath}
     '';
 
   meta = {

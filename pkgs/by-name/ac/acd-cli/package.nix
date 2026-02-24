@@ -34,7 +34,7 @@ python3Packages.buildPythonApplication (finalAttrs: {
 
   postFixup = ''
     function lnOverBin() {
-      rm -f $out/bin/{$2,.$2-wrapped}
+      rm -f $out/{bin,libexec}/"$2"
       ln -s $out/bin/$1 $out/bin/$2
     }
     lnOverBin acd_cli.py acd-cli

@@ -68,10 +68,10 @@ stdenv.mkDerivation (finalAttrs: {
     runHook preInstall
   ''
   + lib.optionalString stdenv.hostPlatform.isLinux ''
-    install -Dm755 bin/kiro-cli $out/bin/.kiro-wrapped
+    install -Dm755 bin/kiro-cli $out/libexec/kiro
     install -Dm755 bin/kiro-cli-chat $out/bin/kiro-cli-chat
     install -Dm755 bin/kiro-cli-term $out/bin/kiro-cli-term
-    makeBinaryWrapper $out/bin/.kiro-wrapped $out/bin/kiro \
+    makeBinaryWrapper $out/libexec/kiro $out/bin/kiro \
       --prefix PATH : $out/bin
   ''
   + lib.optionalString stdenv.hostPlatform.isDarwin ''

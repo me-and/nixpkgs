@@ -32,7 +32,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   installPhase = ''
     mkdir -p "$out/bin"
-    cp src/slack "$out/bin/.slack-wrapped"
+    cp src/slack "$out/libexec/slack"
 
     cat <<-WRAPPER > "$out/bin/slack"
     #!${runtimeShell}
@@ -52,7 +52,7 @@ stdenv.mkDerivation (finalAttrs: {
         gnused
       ]
     }:"\$PATH"
-    exec "$out/bin/.slack-wrapped" "\$@"
+    exec "$out/libexec/slack" "\$@"
     WRAPPER
 
     chmod +x "$out/bin/slack"

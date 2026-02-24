@@ -404,12 +404,12 @@ in
       abi <abi/4.0>,
       include <tunables/global>
 
-      profile ${cfg.package}/bin/{mumble-server,.mumble-server-wrapped} {
+      profile ${cfg.package}/{bin,libexec}/mumble-server {
         include <abstractions/base>
         include <abstractions/nameservice>
         include <abstractions/ssl_certs>
         include "${pkgs.apparmorRulesFromClosure { name = "mumble-server"; } cfg.package}"
-        ${cfg.package}/bin/.mumble-server-wrapped pix,
+        ${cfg.package}/libexec/mumble-server pix,
 
         ${config.environment.etc."os-release".source} r,
         ${config.environment.etc."lsb-release".source} r,

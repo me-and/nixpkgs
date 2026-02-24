@@ -32,6 +32,10 @@ auditTmpdir() {
                 dir=${file%/*}
                 if [ -e "$dir/.$filename-wrapped" ]; then
                     printf '%s\0' "$file" >&4
+                elif [ "$dir" = */bin && -e "${dir%/bin}/libexec/$filename" ]; then
+                    printf '%s\0' "$file" >&4
+                elif [ "$dir" = */sbin && -e "${dir%/sbin}/libexec/$filename" ]; then
+                    printf '%s\0' "$file" >&4
                 fi
             fi
         done

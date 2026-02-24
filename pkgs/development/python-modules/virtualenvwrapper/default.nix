@@ -66,9 +66,10 @@ buildPythonPackage rec {
         # the wrapped file were then called via "exec". The virtualenvwrapper shell scripts
         # aren't normal executables. Instead, the user has to evaluate them.
 
+        mkdir -p -- "$out"/libexec
         for file in "virtualenvwrapper.sh" "virtualenvwrapper_lazy.sh"; do
           local wrapper="$out/bin/$file"
-          local wrapped="$out/bin/.$file-wrapped"
+          local wrapped="$out/libexec/$file"
           mv "$wrapper" "$wrapped"
 
           # WARNING: Don't indent the lines below because that would break EOF

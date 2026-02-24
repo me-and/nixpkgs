@@ -136,7 +136,7 @@ stdenv.mkDerivation (finalAttrs: {
       patchelf \
         --add-needed $out/lib/meshlab/libmeshlab-common.so \
         --add-needed $out/lib/meshlab/libmeshlab-common-gui.so \
-        $out/bin/.meshlab-wrapped
+        $out/libexec/meshlab
     ''
     + lib.optionalString stdenv.hostPlatform.isDarwin ''
       wrapQtApp "$out/Applications/meshlab.app/Contents/MacOS/meshlab"

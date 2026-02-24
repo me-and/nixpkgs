@@ -26,16 +26,6 @@ stdenv.mkDerivation {
 
   nativeBuildInputs = [ makeWrapper ];
 
-  patchPhase = ''
-    runHook prePatch
-
-    # fix .lldap-cli-wrapped showing up in usage
-    substituteInPlace lldap-cli \
-      --replace-fail '$(basename $0)' lldap-cli
-
-    runHook postPatch
-  '';
-
   dontConfigure = true;
   dontBuild = true;
 

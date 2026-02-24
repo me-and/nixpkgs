@@ -17,7 +17,7 @@ let
       workpath=$PWD
       cd -- "$(dirname "$p")"
       binary=$(basename --suffix=.dsp "$p")
-      rm -f .$binary-wrapped
+      rm -f -- ../libexec/"$binary"
       wrapProgram $binary --set QT_PLUGIN_PATH "${qt5.qtbase}/${qt5.qtbase.qtPluginPrefix}"
       sed -i $binary -e 's@exec@cd "$(dirname "$(readlink -f "''${BASH_SOURCE[0]}")")" \&\& exec@g'
       cd $workpath

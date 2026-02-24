@@ -79,7 +79,7 @@ python3Packages.buildPythonApplication (finalAttrs: {
   preFixup = ''
     makeWrapperArgs+=(--prefix XDG_DATA_DIRS : $out/share)
     makeWrapperArgs+=(--prefix XDG_DATA_DIRS : ${adwaita-icon-theme}/share)
-    makeWrapperArgs+=(--argv0 $out/bin/.zim-wrapped)
+    makeWrapperArgs+=(--argv0 $out/libexec/zim)
     makeWrapperArgs+=("''${gappsWrapperArgs[@]}")
   '';
 

@@ -166,13 +166,14 @@ stdenv.mkDerivation (finalAttrs: {
         echo ""
       fi
 
-      exec -a "$0" "${placeholder "out"}/bin/.vcpkg-wrapped" \
+      exec -a "$0" "${placeholder "out"}/libexec/vcpkg" \
       ${lib.concatMapStringsSep "\n" ({ arg, env, ... }: "  " + ''${arg}="''$${env}" \'') argsWithDefault}
         "''${FINAL_NONMODIFIED_ARGS[@]}"
     '';
 
   postFixup = lib.optionalString doWrap ''
-    mv "$out/bin/vcpkg" "$out/bin/.vcpkg-wrapped"
+    mkdir -p -- "$out"/libexec
+    mv "$out/bin/vcpkg" "$out/libexec/vcpkg"
     install -Dm555 "$vcpkgWrapperPath" "$out/bin/vcpkg"
   '';
 

@@ -333,7 +333,7 @@ stdenv.mkDerivation rec {
     '';
 
   # Bazel binary includes zip archive at the end that `strip` would end up discarding
-  stripExclude = [ "bin/.bazel-${version}-*-wrapped" ];
+  stripExclude = [ "libexec/bazel-${version}-*" ];
 
   passthru = {
     tests = {

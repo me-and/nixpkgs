@@ -115,7 +115,7 @@ perlPackages.buildPerlPackage rec {
         continue
       fi
       echo "Wrapping $n for taint mode"
-      orig="$out/bin/.$(basename "$n")-wrapped"
+      orig="$out/libexec/$(basename "$n")"
       mv "$n" "$orig"
       # We don't inherit argv0 so that $^X works properly in e.g. sa-compile
       makeWrapper "${perlPackages.perl}/bin/perl" "$n" \

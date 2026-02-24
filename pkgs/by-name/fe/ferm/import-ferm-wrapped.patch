@@ -5,10 +5,10 @@
      my $ferm;
      if ($0 =~ /^(.*)\//) {
 -        $ferm = "$1/ferm";
-+        $ferm = "$1/.ferm-wrapped";
++        $ferm = "$1/../libexec/ferm";
      } else {
 -        $ferm = 'ferm';
-+        $ferm = '.ferm-wrapped';
++        $ferm = '../libexec/ferm';
      }
  
      # Perl 5.24 requires this prefix or else it will only look in @INC

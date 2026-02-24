@@ -618,8 +618,9 @@ stdenv.mkDerivation {
     ! grep -F -r 'GETOPT=getopt' $out
     ! grep -F -r 'GETOPT=/usr/local/bin/getopt' $out
 
-    mkdir -p $client/{bin,etc,${sitePackages},share/bash-completion/completions}
-    cp -r $out/bin/{ceph,.ceph-wrapped,rados,rbd,rbdmap} $client/bin
+    mkdir -p $client/{bin,libexec,etc,${sitePackages},share/bash-completion/completions}
+    cp -r $out/bin/{ceph,rados,rbd,rbdmap} $client/bin
+    cp -r $out/libexec/ceph $client/libexec
     cp -r $out/bin/ceph-{authtool,conf,dencoder,rbdnamer,syn} $client/bin
     cp -r $out/bin/rbd-replay* $client/bin
     cp -r $out/sbin/mount.ceph $client/bin
@@ -627,9 +628,9 @@ stdenv.mkDerivation {
     ln -s bin $client/sbin
     cp -r $out/${sitePackages}/* $client/${sitePackages}
     cp -r $out/etc/bash_completion.d $client/share/bash-completion/completions
-    # wrapPythonPrograms modifies .ceph-wrapped, so lets just update its paths
-    substituteInPlace $client/bin/ceph          --replace $out $client
-    substituteInPlace $client/bin/.ceph-wrapped --replace $out $client
+    # wrapPythonPrograms modifies libexec/ceph, so lets just update its paths
+    substituteInPlace $client/bin/ceph     --replace $out $client
+    substituteInPlace $client/libexec/ceph --replace $out $client
   '';
 
   outputs = [

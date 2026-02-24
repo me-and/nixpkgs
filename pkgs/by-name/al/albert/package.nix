@@ -60,7 +60,7 @@ stdenv.mkDerivation (finalAttrs: {
   '';
 
   postFixup = ''
-    for i in $out/{bin/.albert-wrapped,lib/albert/plugins/*.so}; do
+    for i in $out/{libexec/albert,lib/albert/plugins/*.so}; do
       patchelf $i --add-rpath $out/lib/albert
     done
   '';

@@ -88,9 +88,9 @@ ps.buildPythonApplication (finalAttrs: {
               --setenv=PATH="$PATH" \
               --setenv=PYTHONNOUSERSITE="$PYTHONNOUSERSITE" \
               --setenv=QT_QPA_PLATFORM="$QT_QPA_PLATFORM" \
-              ${placeholder "out"}/bin/.normcap-wrapped "$@"
+              ${placeholder "out"}/libexec/normcap "$@"
         else
-            exec -a "$0" ${placeholder "out"}/bin/.normcap-wrapped "$@"
+            exec -a "$0" ${placeholder "out"}/libexec/normcap "$@"
         fi
         exit $?
       '

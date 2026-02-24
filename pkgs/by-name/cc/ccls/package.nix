@@ -39,13 +39,13 @@ stdenv.mkDerivation (finalAttrs: {
   '';
 
   postFixup = ''
-    export wrapped=".ccls-wrapped"
-    mv $out/bin/ccls $out/bin/$wrapped
+    mkdir -- "$out"/libexec
+    mv $out/bin/ccls $out/libexec/ccls
     substitute ${./wrapper} $out/bin/ccls \
       --replace-fail '@clang@' '${llvmPackages.clang}' \
       --replace-fail '@shell@' '${runtimeShell}' \
-      --replace-fail '@wrapped@' "$wrapped"
-    chmod --reference=$out/bin/$wrapped $out/bin/ccls
+      --replace-fail '@wrapped@' "$out/libexec/ccls"
+    chmod --reference=$out/libexec/ccls $out/bin/ccls
   '';
 
   meta = {

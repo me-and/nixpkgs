@@ -246,6 +246,7 @@ fn handle_path(
                 if typ.is_file() && !target.exists() {
                     copy_file(&source, &target, &p.dlopen, queue)?;
 
+                    // TODO Looks like I need to do _something_ here...
                     if let Some(filename) = source.file_name() {
                         source.set_file_name(OsString::from_iter([
                             OsStr::new("."),

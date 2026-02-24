@@ -42,7 +42,7 @@ makePythonHook {
         '';
 
       # This preamble does two things:
-      # * Sets argv[0] to the original application's name; otherwise it would be .foo-wrapped.
+      # * Sets argv[0] to the original application's name; otherwise it may be .foo-wrapped.
       #   Python doesn't support `exec -a`.
       # * Adds all required libraries to sys.path via `site.addsitedir`. It also handles *.pth files.
       preamble = ''

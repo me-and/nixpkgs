@@ -62,7 +62,7 @@ python3Packages.buildPythonApplication rec {
   postInstall = ''
     # paperwork-shell needs to be re-wrapped with access to paperwork
     for exe in paperwork-cli paperwork-json; do
-      cp ${python3Packages.paperwork-shell}/bin/.$exe-wrapped $out/bin/$exe
+      cp ${python3Packages.paperwork-shell}/libexec/$exe $out/bin/$exe
     done
     # install desktop files and icons
     XDG_DATA_HOME=$out/share $out/bin/paperwork-gtk install --user

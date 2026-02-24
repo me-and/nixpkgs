@@ -110,7 +110,7 @@ else
 
       for binaryFile in \
           ${python3.sitePackages}/vapoursynth${ext} \
-          bin/.vspipe-wrapped
+          libexec/vspipe
       do
           old_rpath=$(patchelf --print-rpath ${vapoursynth}/$binaryFile)
           new_rpath="''${old_rpath//"${vapoursynth}"/"$out"}"
@@ -130,6 +130,6 @@ else
           libvapoursynth-script${ext}.0.0.0 \
           $out/lib/libvapoursynth-script${ext}.0
 
-      makeWrapper $out/bin/.vspipe-wrapped $out/bin/vspipe \
+      makeWrapper $out/libexec/vspipe $out/bin/vspipe \
           --prefix PYTHONPATH : $out/${python3.sitePackages}
     ''

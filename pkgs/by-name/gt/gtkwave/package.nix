@@ -52,7 +52,7 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   postFixup = lib.optionalString stdenv.hostPlatform.isDarwin ''
-    mv $out/bin/.gtkwave-wrapped $out/Applications/GTKWave.app/Contents/MacOS/.gtkwave-wrapped
+    mv $out/libexec/gtkwave $out/Applications/GTKWave.app/Contents/MacOS/.gtkwave-wrapped
     makeWrapper $out/Applications/GTKWave.app/Contents/MacOS/.gtkwave-wrapped $out/Applications/GTKWave.app/Contents/MacOS/GTKWave \
       --inherit-argv0 \
       "''${gappsWrapperArgs[@]}"

@@ -41,6 +41,8 @@ object is copied depends on its type.
    - If an unwrapped file exists as `.[filename]-wrapped`, then it is
      also listed as an object to be copied.
 
+   - TODO: DO I NEED TO DO SOMETHING ELSE TO PICK UP FILES FROM LIBEXEC HERE?
+
 2. A directory's direct children are listed as objects to be copied,
    and a directory at the same absolute path in the initrd is created.
 

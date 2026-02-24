@@ -73,7 +73,7 @@ stdenv.mkDerivation (finalAttrs: {
       comment = "Kart racing mod based on SRB2";
       desktopName = name;
       genericName = name;
-      startupWMClass = ".srb2kart-wrapped";
+      startupWMClass = "srb2kart";
       categories = [ "Game" ];
     })
   ];

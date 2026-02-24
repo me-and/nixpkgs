@@ -66,9 +66,9 @@ stdenv.mkDerivation rec {
   installPhase = ''
     runHook preInstall
 
-    install -D -m 0755 ${bloop-binary} $out/.bloop-wrapped
+    install -D -m 0755 ${bloop-binary} $out/libexec/bloop
 
-    makeWrapper $out/.bloop-wrapped $out/bin/bloop
+    makeWrapper $out/libexec/bloop $out/bin/bloop
 
     #Install completions
     installShellCompletion --name bloop --bash ${bloop-bash}

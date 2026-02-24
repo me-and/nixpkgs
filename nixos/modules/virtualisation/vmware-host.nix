@@ -106,7 +106,7 @@ in
         setuid = true;
         owner = "root";
         group = "root";
-        source = "${cfg.package}/lib/vmware/bin/.vmware-vmx-wrapped";
+        source = "${cfg.package}/lib/vmware/libexec/vmware-vmx";
       };
     };
 

@@ -185,7 +185,7 @@ rec {
 
     passthru.binlore.out = binlore.synthesize finalAttrs.finalPackage ''
       execer can bin/hello bin/{a,b,c}
-      wrapper bin/hello bin/.hello-wrapped
+      wrapper bin/hello libexec/hello
     '';
 
     And here's a specific example of how pathname expansion enables us

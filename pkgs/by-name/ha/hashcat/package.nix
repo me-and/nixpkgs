@@ -110,7 +110,7 @@ stdenv.mkDerivation (finalAttrs: {
         --prefix LD_LIBRARY_PATH : ${lib.escapeShellArg LD_LIBRARY_PATH}
     ''
     + lib.optionalString (cudaSupport || rocmSupport) ''
-      for program in $out/bin/hashcat $out/bin/.hashcat-wrapped; do
+      for program in $out/bin/hashcat $out/libexec/hashcat; do
         isELF "$program" || continue
         addDriverRunpath "$program"
       done

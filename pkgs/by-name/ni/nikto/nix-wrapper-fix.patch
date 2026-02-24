@@ -7,7 +7,7 @@ index 2cb07f9..323e666 100755
      my $NIKTODIR = abs_path($0);
      chomp($NIKTODIR);
 -    $NIKTODIR =~ s#[\\/]nikto.pl$##;
-+    $NIKTODIR =~ s#[\\/]bin[\\/]\.nikto-wrapped$##;
++    $NIKTODIR =~ s#[\\/]libexec[\\/]nikto$##;
  
      # Guess user's home directory -- to support Windows
      foreach my $var (split(/ /, "HOME USERPROFILE")) {

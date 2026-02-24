@@ -106,7 +106,7 @@ stdenv.mkDerivation (finalAttrs: {
       ''
     else
       ''
-        patchelf $out/bin/.ares-wrapped \
+        patchelf $out/libexec/ares \
           --add-rpath ${
             lib.makeLibraryPath [
               librashader

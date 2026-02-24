@@ -130,11 +130,11 @@ with haskellLib;
             lib.optionalAttrs (pkgs.stdenv.hostPlatform.isDarwin && pkgs.stdenv.hostPlatform.isAarch64) {
               postInstall = ''
                 ${old.postInstall or ""}
-                remove-references-to -t ${scope.HTTP} "$out/bin/.cabal-wrapped"
+                remove-references-to -t ${scope.HTTP} "$out/libexec/cabal"
                 # if we don't override Cabal, it is taken from ghc's core libs
                 remove-references-to -t ${
                   if scope.Cabal != null then scope.Cabal else scope.ghc
-                } "$out/bin/.cabal-wrapped"
+                } "$out/libexec/cabal"
               '';
             }
           ) cabal-install;

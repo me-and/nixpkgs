@@ -55,7 +55,7 @@ stdenv.mkDerivation (finalAttrs: {
         airspy
         rtl-sdr
       ]
-    }" $out/bin/.guglielmo-wrapped
+    }" $out/libexec/guglielmo
   '';
 
   meta = {

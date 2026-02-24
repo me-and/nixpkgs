@@ -81,12 +81,12 @@ in
         copy_bin_and_libs ${pkgs.gnused}/bin/gnused
         copy_bin_and_libs ${pkgs.gnugrep}/bin/gnugrep
 
-        copy_bin_and_libs ${pkgs.tpm2-tools}/bin/.tpm2-wrapped
-        mv $out/bin/{.tpm2-wrapped,tpm2}
+        copy_bin_and_libs ${pkgs.tpm2-tools}/libexec/tpm2
+        mv $out/{libexec,bin}/tpm2
         cp {${pkgs.tpm2-tss},$out}/lib/libtss2-tcti-device.so.0
 
-        copy_bin_and_libs ${cfg.package}/bin/.clevis-wrapped
-        mv $out/bin/{.clevis-wrapped,clevis}
+        copy_bin_and_libs ${cfg.package}/libexec/clevis
+        mv $out/{libexec,bin}/clevis
 
         for BIN in ${cfg.package}/bin/clevis-decrypt*; do
           copy_bin_and_libs $BIN

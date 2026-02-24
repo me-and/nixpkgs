@@ -97,7 +97,7 @@ stdenv.mkDerivation (finalAttrs: {
   # need to explicitly tell autoPatchelf about it.
   postFixup = ''
     patchelf --debug --add-needed libpython${python3.pythonVersion}.so \
-      "$out/bin/.kmymoney-wrapped"
+      "$out/libexec/kmymoney"
   '';
 
   meta = {

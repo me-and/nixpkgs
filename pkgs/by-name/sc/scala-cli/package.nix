@@ -54,8 +54,8 @@ stdenv.mkDerivation {
 
   installPhase = ''
     runHook preInstall
-    install -Dm755 scala-cli $out/bin/.scala-cli-wrapped
-    makeWrapper $out/bin/.scala-cli-wrapped $out/bin/scala-cli \
+    install -Dm755 scala-cli $out/libexec/scala-cli
+    makeWrapper $out/libexec/scala-cli $out/bin/scala-cli \
       --set JAVA_HOME ${jre.home} \
       --argv0 "$out/bin/scala-cli"
     runHook postInstall
@@ -72,7 +72,7 @@ stdenv.mkDerivation {
       # hack to ensure the completion function looks right
       # as $0 is used to generate the compdef directive
       mkdir temp
-      cp $out/bin/.scala-cli-wrapped temp/scala-cli
+      cp $out/libexec/scala-cli temp/scala-cli
       PATH="./temp:$PATH"
 
       installShellCompletion --cmd scala-cli \
