@@ -19,6 +19,7 @@ let
     literalExpression
     mapAttrsToList
     mkAfter
+    mkDefault
     mkIf
     mkOption
     mkRenamedOptionModuleWith
@@ -308,9 +309,10 @@ in
             system-features = mkOption {
               type = types.listOf types.str;
               # We expose system-featuers here and in config below.
-              # This allows users to access the default value via `options.nix.settings.system-features`
+              # This allows users to access the default value via `options.nix.settings.valueMeta.configuration.options.system-features.default`
               default = defaultSystemFeatures;
               defaultText = literalExpression ''[ "nixos-test" "benchmark" "big-parallel" "kvm" "gccarch-<arch>" ]'';
+              example = literalExpression ''lib.remove "kvm" options.nix.settings.valueMeta.configuration.options.system-features.default'';
               description = ''
                 The set of features supported by the machine. Derivations
                 can express dependencies on system features through the
@@ -371,7 +373,7 @@ in
       trusted-public-keys = [ "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=" ];
       trusted-users = [ "root" ];
       substituters = mkAfter [ "https://cache.nixos.org/" ];
-      system-features = defaultSystemFeatures;
+      system-features = mkDefault defaultSystemFeatures;
     };
   };
 }
