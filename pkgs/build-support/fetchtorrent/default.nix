@@ -31,15 +31,34 @@ let
   # Default to flattening if no flatten argument was specified.
   flatten' = if flatten == null then true else flatten;
 
-  transmissionFinishScript = writeShellScript "fetch-bittorrent-done.sh" ''
-    ${postUnpack}
-    # Flatten the directory, so that only the torrent contents are in $out, not
-    # the folder name
-    shopt -s dotglob
-    mv -v $downloadedDirectory/*/* $out
+  flattenScript = ''
+    shopt -s dotglob nullglob
+    downloadedFiles=($downloadedDirectory/*)
+    if [[ ''${#downloadedFiles[@]} -eq 0 ]]; then
+      echo "Failed to download any files."
+      exit 1
+    elif [[ ''${#downloadedFiles[@]} -eq 1 ]] && [[ -d "$downloadedFiles" ]]; then
+      # Flatten the directory, so that only the torrent contents are in $out,
+      # not the folder name
+      mv -v "$downloadedFiles"/* $out
+    else
+      # Either we downloaded a single (regular) file, or we downloaded
+      # multiple files/directories. We can't flatten, so we move them to
+      # $out.
+      mv -v "''${downloadedFiles[@]}" $out
+    fi
     rm -v -rf $downloadedDirectory
-    unset downloadedDirectory
+    unset downloadedDirectory downloadedFiles
+  '';
+
+  finishScript = ''
+    ${postUnpack}
+    ${lib.optionalString flatten' flattenScript}
     ${postFetch}
+  '';
+
+  transmissionFinishScript = writeShellScript "fetch-bittorrent-done.sh" ''
+    ${finishScript}
     kill $PPID
   '';
   jsonConfig = (formats.json { }).generate "jsonConfig" config;
@@ -112,61 +131,41 @@ runCommand name
     # in nixpkgs
     inherit url;
   }
-  (
-    if (backend == "transmission") then
-      ''
-        export HOME=$TMP
-        mkdir -p $out
-        export downloadedDirectory=$(mktemp -d $out/downloadedDirectory.XXXXXXXXXX)
-        mkdir -p $HOME/.config/transmission
-        cp ${jsonConfig} $HOME/.config/transmission/settings.json
-        port="$(shuf -n 1 -i 49152-65535)"
-        function handleChild {
-          # This detects failures and logs the contents of the transmission fetch
-          find $out
-          exit 0
-        }
-        trap handleChild CHLD
-        transmission-cli \
-            --port "$port" \
-            --portmap \
-            --finish ${transmissionFinishScript} \
-            --download-dir "$downloadedDirectory" \
-            "$url"
-      ''
-    else
-      ''
-        export HOME=$TMP
-      ''
-      + lib.optionalString flatten' ''
-        mkdir -p $out
-        downloadedDirectory=$(mktemp -d $out/downloadedDirectory.XXXXXXXXXX)
-      ''
-      + lib.optionalString (!flatten') ''
-        downloadedDirectory=$out
-      ''
-      + ''
-        port="$(shuf -n 1 -i 49152-65535)"
-
-        rqbit \
-            --disable-dht-persistence \
-            --http-api-listen-addr "127.0.0.1:$port" \
-            download \
-            -o "$downloadedDirectory" \
-            --exit-on-finish \
-            "$url"
-
-        ${postUnpack}
-      ''
-      + lib.optionalString flatten' ''
-        # Flatten the directory, so that only the torrent contents are in $out,
-        # not the folder name
-        shopt -s dotglob
-        mv -v $downloadedDirectory/*/* $out
-        rm -v -rf $downloadedDirectory
-        unset downloadedDirectory
-      ''
-      + ''
-        ${postFetch}
-      ''
-  )
+  ''
+    export HOME=$TMP
+    mkdir -p $out
+    export downloadedDirectory=${
+      if flatten' then "$(mktemp -d $out/downloadedDirectory.XXXXXXXXXX)" else "$out"
+    }
+    port="$(shuf -n 1 -i 49152-65535)"
+    ${
+      if (backend == "transmission") then
+        ''
+          mkdir -p $HOME/.config/transmission
+          cp ${jsonConfig} $HOME/.config/transmission/settings.json
+          function handleChild {
+            # This detects failures and logs the contents of the transmission fetch
+            find $out
+            exit 0
+          }
+          trap handleChild CHLD
+          transmission-cli \
+              --port "$port" \
+              --portmap \
+              --finish ${transmissionFinishScript} \
+              --download-dir "$downloadedDirectory" \
+              "$url"
+        ''
+      else
+        ''
+          rqbit \
+              --disable-dht-persistence \
+              --http-api-listen-addr "127.0.0.1:$port" \
+              download \
+              -o "$downloadedDirectory" \
+              --exit-on-finish \
+              "$url"
+          ${finishScript}
+        ''
+    }
+  ''
