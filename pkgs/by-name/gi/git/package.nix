@@ -50,6 +50,7 @@
   sysctl,
   deterministic-host-uname, # trick Makefile into targeting the host platform when cross-compiling
   doInstallCheck ? !stdenv.hostPlatform.isDarwin, # extremely slow on darwin
+  versionCheckHook,
   tests,
   rustSupport ? lib.meta.availableOn stdenv.hostPlatform rustc,
   cargo,
@@ -489,7 +490,7 @@ stdenv.mkDerivation (finalAttrs: {
     "PERL_PATH=${buildPackages.perl}/bin/perl"
   ];
 
-  nativeInstallCheckInputs = lib.optional (
+  nativeInstallCheckInputs = [ versionCheckHook ] ++ lib.optional (
     stdenv.hostPlatform.isDarwin || stdenv.hostPlatform.isFreeBSD
   ) sysctl;
 

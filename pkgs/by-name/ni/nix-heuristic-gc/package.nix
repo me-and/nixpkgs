@@ -6,6 +6,7 @@
   nixVersions,
   boost,
   python3Packages,
+  versionCheckHook,
 }:
 python3Packages.buildPythonPackage rec {
   pname = "nix-heuristic-gc";
@@ -33,7 +34,7 @@ python3Packages.buildPythonPackage rec {
     python3Packages.humanfriendly
     python3Packages.rustworkx
   ];
-  checkInputs = [ python3Packages.pytestCheckHook ];
+  checkInputs = [ python3Packages.pytestCheckHook versionCheckHook ];
 
   preCheck = "mv nix_heuristic_gc .nix_heuristic_gc";
 
