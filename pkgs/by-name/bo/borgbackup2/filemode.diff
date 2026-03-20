@@ -1,0 +1,22 @@
+diff --git a/src/borg/testsuite/archiver/__init__.py b/src/borg/testsuite/archiver/__init__.py
+index ebb27f790..ac2fb92e0 100644
+--- a/src/borg/testsuite/archiver/__init__.py
++++ b/src/borg/testsuite/archiver/__init__.py
+@@ -201,8 +201,6 @@ def create_test_files(input_path, create_hardlinks=True):
+     create_regular_file(input_path, "flagfile", size=1024)
+     # Directory
+     create_regular_file(input_path, "dir2/file2", size=1024 * 80)
+-    # File mode
+-    os.chmod("input/file1", 0o4755)
+     # Hard link
+     if are_hardlinks_supported() and create_hardlinks:
+         os.link(os.path.join(input_path, "file1"), os.path.join(input_path, "hardlink"))
+@@ -242,6 +240,8 @@ def create_test_files(input_path, create_hardlinks=True):
+             # File owner
+             os.chown("input/file1", 100, 200)  # raises OSError invalid argument on cygwin
+             # File mode
++            os.chmod("input/file1", 0o4755)
++            # Directory mode
+             os.chmod("input/dir2", 0o555)  # if we take away write perms, we need root to remove contents
+             have_root = True  # we have (fake)root
+         except PermissionError:

@@ -1,0 +1,19 @@
+diff --git a/src/borg/testsuite/shell_completions_test.py b/src/borg/testsuite/shell_completions_test.py
+index 4fa26faa5..e4850d0bd 100644
+--- a/src/borg/testsuite/shell_completions_test.py
++++ b/src/borg/testsuite/shell_completions_test.py
+@@ -3,12 +3,12 @@
+ 
+ import pytest
+ 
+-SHELL_COMPLETIONS_DIR = Path(__file__).parent / ".." / ".." / ".." / "scripts" / "shell_completions"
++SHELL_COMPLETIONS_DIR = Path("PLACEHOLDER_OUT") / "share" / "fish" / "vendor_completions.d"
+ 
+ 
+ def test_fish_completion_is_valid():
+     """Test that the Fish completion file is valid Fish syntax."""
+-    fish_completion_file = SHELL_COMPLETIONS_DIR / "fish" / "borg.fish"
++    fish_completion_file = SHELL_COMPLETIONS_DIR / "borg.fish"
+     assert fish_completion_file.is_file()
+ 
+     # Check if Fish is available
