@@ -2233,6 +2233,8 @@ self: super: with self; {
 
   borb = callPackage ../development/python-modules/borb { };
 
+  borghash = callPackage ../development/python-modules/borghash { };
+
   bork = callPackage ../development/python-modules/bork { };
 
   bosch-alarm-mode2 = callPackage ../development/python-modules/bosch-alarm-mode2 { };
