@@ -215,8 +215,21 @@ in
   makeHardcodeGsettingsPatch = recurseIntoAttrs (callPackage ./make-hardcode-gsettings-patch { });
 
   makeWrapper = callPackage ./make-wrapper { };
+  makeWrapper2 = callPackage ./make-wrapper { makeWrapper = pkgs.makeWrapper2; };
   makeBinaryWrapper = callPackage ./make-binary-wrapper {
     makeBinaryWrapper = pkgs.makeBinaryWrapper.override {
+      # Enable sanitizers in the tests only, to avoid the performance cost in regular usage.
+      # The sanitizers cause errors on aarch64-darwin, see https://github.com/NixOS/nixpkgs/pull/150079#issuecomment-994132734
+      sanitizers =
+        optionals (!(pkgs.stdenv.hostPlatform.isDarwin && pkgs.stdenv.hostPlatform.isAarch64))
+          [
+            "undefined"
+            "address"
+          ];
+    };
+  };
+  makeBinaryWrapper2 = callPackage ./make-binary-wrapper {
+    makeBinaryWrapper = pkgs.makeBinaryWrapper2.override {
       # Enable sanitizers in the tests only, to avoid the performance cost in regular usage.
       # The sanitizers cause errors on aarch64-darwin, see https://github.com/NixOS/nixpkgs/pull/150079#issuecomment-994132734
       sanitizers =

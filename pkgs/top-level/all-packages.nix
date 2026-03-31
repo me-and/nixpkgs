@@ -738,6 +738,7 @@ with pkgs;
   makeInitrdNGTool = callPackage ../build-support/kernel/make-initrd-ng-tool.nix { };
 
   makeWrapper = makeShellWrapper;
+  makeWrapper2 = makeShellWrapper2;
 
   makeShellWrapper = makeSetupHook {
     name = "make-shell-wrapper-hook";
@@ -754,6 +755,21 @@ with pkgs;
       tests = tests.makeWrapper;
     };
   } ../build-support/setup-hooks/make-wrapper.sh;
+  makeShellWrapper2 = makeSetupHook {
+    name = "make-shell-wrapper-hook";
+    propagatedBuildInputs = [ dieHook ];
+    substitutions = {
+      # targetPackages.runtimeShell only exists when pkgs == targetPackages (when targetPackages is not  __raw)
+      shell =
+        if targetPackages ? runtimeShell then
+          targetPackages.runtimeShell
+        else
+          throw "makeWrapper/makeShellWrapper must be in nativeBuildInputs";
+    };
+    passthru = {
+      tests = tests.makeWrapper2;
+    };
+  } ../build-support/setup-hooks/make-wrapper2.sh;
 
   compressFirmwareXz = callPackage ../build-support/kernel/compress-firmware.nix { type = "xz"; };
 
