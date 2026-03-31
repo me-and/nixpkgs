@@ -71,7 +71,7 @@ wrapProgramBinary() {
     hidden=".${prog}-wrapped"
   fi
 
-  while [ -e "$hidden" ]; do
+  while [[ -e "$hidden" ]]; do
     hidden="${hidden}_"
   done
   mv -- "$prog" "$hidden"
@@ -106,7 +106,7 @@ makeCWrapper() {
         cmd=$(setEnv "${params[n + 1]}" "${params[n + 2]}")
         main="$main$cmd"$'\n'
         n=$((n + 2))
-        [ $n -ge "$length" ] && main="$main#error makeCWrapper: $p takes 2 arguments"$'\n'
+        [[ $n -ge "$length" ]] && main="$main#error makeCWrapper: $p takes 2 arguments"$'\n'
       ;;
       --set-default)
         cmd=$(setDefaultEnv "${params[n + 1]}" "${params[n + 2]}")
@@ -114,7 +114,7 @@ makeCWrapper() {
         uses_stdio=1
         uses_assert_success=1
         n=$((n + 2))
-        [ $n -ge "$length" ] && main="$main#error makeCWrapper: $p takes 2 arguments"$'\n'
+        [[ $n -ge "$length" ]] && main="$main#error makeCWrapper: $p takes 2 arguments"$'\n'
       ;;
       --unset)
         cmd=$(unsetEnv "${params[n + 1]}")
@@ -122,7 +122,7 @@ makeCWrapper() {
         uses_stdio=1
         uses_assert_success=1
         n=$((n + 1))
-        [ $n -ge "$length" ] && main="$main#error makeCWrapper: $p takes 1 argument"$'\n'
+        [[ $n -ge "$length" ]] && main="$main#error makeCWrapper: $p takes 1 argument"$'\n'
       ;;
       --prefix)
         cmd=$(setEnvPrefix "${params[n + 1]}" "${params[n + 2]}" "${params[n + 3]}")
@@ -135,7 +135,7 @@ makeCWrapper() {
         uses_assert_success=1
         uses_assert=1
         n=$((n + 3))
-        [ $n -ge "$length" ] && main="$main#error makeCWrapper: $p takes 3 arguments"$'\n'
+        [[ $n -ge "$length" ]] && main="$main#error makeCWrapper: $p takes 3 arguments"$'\n'
       ;;
       --suffix)
         cmd=$(setEnvSuffix "${params[n + 1]}" "${params[n + 2]}" "${params[n + 3]}")
@@ -148,7 +148,7 @@ makeCWrapper() {
         uses_assert_success=1
         uses_assert=1
         n=$((n + 3))
-        [ $n -ge "$length" ] && main="$main#error makeCWrapper: $p takes 3 arguments"$'\n'
+        [[ $n -ge "$length" ]] && main="$main#error makeCWrapper: $p takes 3 arguments"$'\n'
       ;;
       --chdir)
         cmd=$(changeDir "${params[n + 1]}")
@@ -156,7 +156,7 @@ makeCWrapper() {
         uses_stdio=1
         uses_assert_success=1
         n=$((n + 1))
-        [ $n -ge "$length" ] && main="$main#error makeCWrapper: $p takes 1 argument"$'\n'
+        [[ $n -ge "$length" ]] && main="$main#error makeCWrapper: $p takes 1 argument"$'\n'
       ;;
       --run)
         die 'makeBinaryWrapper does not support --run, use makeShellWrapper instead'
@@ -165,33 +165,33 @@ makeCWrapper() {
         flagsBefore+=("${params[n + 1]}")
         uses_assert=1
         n=$((n + 1))
-        [ $n -ge "$length" ] && main="$main#error makeCWrapper: $p takes 1 argument"$'\n'
+        [[ $n -ge "$length" ]] && main="$main#error makeCWrapper: $p takes 1 argument"$'\n'
       ;;
       --append-flag)
         flagsAfter+=("${params[n + 1]}")
         uses_assert=1
         n=$((n + 1))
-        [ $n -ge "$length" ] && main="$main#error makeCWrapper: $p takes 1 argument"$'\n'
+        [[ $n -ge "$length" ]] && main="$main#error makeCWrapper: $p takes 1 argument"$'\n'
       ;;
       --add-flags)
         read -ra flags <<< "${params[n + 1]}"
         flagsBefore+=("${flags[@]}")
         uses_assert=1
         n=$((n + 1))
-        [ $n -ge "$length" ] && main="$main#error makeCWrapper: $p takes 1 argument"$'\n'
+        [[ $n -ge "$length" ]] && main="$main#error makeCWrapper: $p takes 1 argument"$'\n'
       ;;
       --append-flags)
         read -ra flags <<< "${params[n + 1]}"
         flagsAfter+=("${flags[@]}")
         uses_assert=1
         n=$((n + 1))
-        [ $n -ge "$length" ] && main="$main#error makeCWrapper: $p takes 1 argument"$'\n'
+        [[ $n -ge "$length" ]] && main="$main#error makeCWrapper: $p takes 1 argument"$'\n'
       ;;
       --argv0)
         argv0=$(escapeStringLiteral "${params[n + 1]}")
         inherit_argv0=
         n=$((n + 1))
-        [ $n -ge "$length" ] && main="$main#error makeCWrapper: $p takes 1 argument"$'\n'
+        [[ $n -ge "$length" ]] && main="$main#error makeCWrapper: $p takes 1 argument"$'\n'
       ;;
       --inherit-argv0)
         # Whichever comes last of --argv0 and --inherit-argv0 wins
@@ -209,21 +209,21 @@ makeCWrapper() {
     esac
   done
   (( ${#flagsBefore[@]} + ${#flagsAfter[@]} > 0 )) && main="$main"${main:+$'\n'}$(addFlags flagsBefore flagsAfter)$'\n'$'\n'
-  [ -z "$inherit_argv0" ] && main="${main}argv[0] = \"${argv0:-${executable}}\";"$'\n'
-  [ -z "$resolve_argv0" ] || main="${main}argv[0] = resolve_argv0(argv[0]);"$'\n'
+  [[ -z "$inherit_argv0" ]] && main="${main}argv[0] = \"${argv0:-${executable}}\";"$'\n'
+  [[ -z "$resolve_argv0" ]] || main="${main}argv[0] = resolve_argv0(argv[0]);"$'\n'
   main="${main}return execv(\"${executable}\", argv);"$'\n'
 
-  [ -z "$uses_asprintf" ] || printf '%s\n' "#define _GNU_SOURCE         /* See feature_test_macros(7) */"
+  [[ -z "$uses_asprintf" ]] || printf '%s\n' "#define _GNU_SOURCE         /* See feature_test_macros(7) */"
   printf '%s\n' "#include <unistd.h>"
   printf '%s\n' "#include <stdlib.h>"
-  [ -z "$uses_assert" ]   || printf '%s\n' "#include <assert.h>"
-  [ -z "$uses_stdio" ]    || printf '%s\n' "#include <stdio.h>"
-  [ -z "$uses_string" ]   || printf '%s\n' "#include <string.h>"
-  [ -z "$uses_assert_success" ] || printf '\n%s\n' "#define assert_success(e) do { if ((e) < 0) { perror(#e); abort(); } } while (0)"
-  [ -z "$uses_sep_surround_check" ] || printf '\n%s\n' "$(setSepSurroundCheck)"
-  [ -z "$uses_prefix" ] || printf '\n%s\n' "$(setEnvPrefixFn)"
-  [ -z "$uses_suffix" ] || printf '\n%s\n' "$(setEnvSuffixFn)"
-  [ -z "$resolve_argv0" ] || printf '\n%s\n' "$(resolveArgv0Fn)"
+  [[ -z "$uses_assert" ]]   || printf '%s\n' "#include <assert.h>"
+  [[ -z "$uses_stdio" ]]    || printf '%s\n' "#include <stdio.h>"
+  [[ -z "$uses_string" ]]   || printf '%s\n' "#include <string.h>"
+  [[ -z "$uses_assert_success" ]] || printf '\n%s\n' "#define assert_success(e) do { if ((e) < 0) { perror(#e); abort(); } } while (0)"
+  [[ -z "$uses_sep_surround_check" ]] || printf '\n%s\n' "$(setSepSurroundCheck)"
+  [[ -z "$uses_prefix" ]] || printf '\n%s\n' "$(setEnvPrefixFn)"
+  [[ -z "$uses_suffix" ]] || printf '\n%s\n' "$(setEnvSuffixFn)"
+  [[ -z "$resolve_argv0" ]] || printf '\n%s\n' "$(resolveArgv0Fn)"
   printf '\n%s' "int main(int argc, char **argv) {"
   printf '\n%s' "$(indent4 "$main")"
   printf '\n%s\n' "}"
@@ -481,7 +481,7 @@ makeCWrapper $(formatArgs "$@")
 formatArgs() {
   printf '%s' "${1@Q}"
   shift
-  while [ $# -gt 0 ]; do
+  while (( $# > 0 )); do
     case "$1" in
       --set)
         formatArgsLine 2 "$@"
@@ -544,7 +544,7 @@ formatArgsLine() {
   shift
   printf '%s' $' \\\n    '"$1"
   shift
-  while [ "$ARG_COUNT" -gt $((LENGTH - $# - 2)) ]; do
+  while (( ARG_COUNT > $(( LENGTH - $# - 2 )) )); do
     printf ' %s' "${1@Q}"
     shift
   done

@@ -236,7 +236,7 @@ wrapProgramShell() {
     hidden=".${prog}-wrapped"
   fi
 
-  while [ -e "$hidden" ]; do
+  while [[ -e "$hidden" ]]; do
     hidden="${hidden}_"
   done
   mv -- "$prog" "$hidden"
