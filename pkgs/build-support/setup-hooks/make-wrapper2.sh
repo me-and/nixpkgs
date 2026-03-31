@@ -119,79 +119,96 @@ makeShellWrapper() {
   for ((n = 2; n < ${#params[*]}; n += 1)); do
     p="${params[$n]}"
 
-    if [[ "$p" == "--set" ]]; then
-      varName="${params[$((n + 1))]}"
-      value="${params[$((n + 2))]}"
-      n=$((n + 2))
-      printf 'export %s=%q\n' "$varName" "$value" >>"$wrapper"
-    elif [[ "$p" == "--set-default" ]]; then
-      varName="${params[$((n + 1))]}"
-      value="${params[$((n + 2))]}"
-      n=$((n + 2))
-      printf 'export %s="${%s-%q}"\n' "$varName" "$varName" "$value" >>"$wrapper"
-    elif [[ "$p" == "--unset" ]]; then
-      varName="${params[$((n + 1))]}"
-      n=$((n + 1))
-      printf 'unset %s\n' "$varName" >>"$wrapper"
-    elif [[ "$p" == "--chdir" ]]; then
-      dir="${params[$((n + 1))]}"
-      n=$((n + 1))
-      printf 'cd -- %q\n' "$dir" >>"$wrapper"
-    elif [[ "$p" == "--run" ]]; then
-      command="${params[$((n + 1))]}"
-      n=$((n + 1))
-      printf '%s\n' "$command" >>"$wrapper"
-    elif [[ ("$p" == "--suffix") || ("$p" == "--prefix") ]]; then
-      varName="${params[$((n + 1))]}"
-      separator="${params[$((n + 2))]}"
-      value="${params[$((n + 3))]}"
-      n=$((n + 3))
-      addValue "$p" "$varName" "$separator" "$value"
-    elif [[ ("$p" == "--suffix-each") || ("$p" == "--prefix-each") ]]; then
-      varName="${params[$((n + 1))]}"
-      separator="${params[$((n + 2))]}"
-      values="${params[$((n + 3))]}"
-      n=$((n + 3))
-      for value in $values; do
+    case "$p" in
+      --set)
+        varName="${params[$((n + 1))]}"
+        value="${params[$((n + 2))]}"
+        n=$((n + 2))
+        printf 'export %s=%q\n' "$varName" "$value" >>"$wrapper"
+      ;;
+      --set-default)
+        varName="${params[$((n + 1))]}"
+        value="${params[$((n + 2))]}"
+        n=$((n + 2))
+        printf 'export %s="${%s-%q}"\n' "$varName" "$varName" "$value" >>"$wrapper"
+      ;;
+      --unset)
+        varName="${params[$((n + 1))]}"
+        n=$((n + 1))
+        printf 'unset %s\n' "$varName" >>"$wrapper"
+      ;;
+      --chdir)
+        dir="${params[$((n + 1))]}"
+        n=$((n + 1))
+        printf 'cd -- %q\n' "$dir" >>"$wrapper"
+      ;;
+      --run)
+        command="${params[$((n + 1))]}"
+        n=$((n + 1))
+        printf '%s\n' "$command" >>"$wrapper"
+      ;;
+      --suffix|--prefix)
+        varName="${params[$((n + 1))]}"
+        separator="${params[$((n + 2))]}"
+        value="${params[$((n + 3))]}"
+        n=$((n + 3))
         addValue "$p" "$varName" "$separator" "$value"
-      done
-    elif [[ ("$p" == "--suffix-contents") || ("$p" == "--prefix-contents") ]]; then
-      varName="${params[$((n + 1))]}"
-      separator="${params[$((n + 2))]}"
-      fileNames="${params[$((n + 3))]}"
-      n=$((n + 3))
-      for fileName in $fileNames; do
-        contents="$(cat "$fileName")"
-        addValue "$p" "$varName" "$separator" "$contents"
-      done
-    elif [[ "$p" == "--add-flag" ]]; then
-      flags=${params[n + 1]@Q}
-      n=$((n + 1))
-      flagsBefore="${flagsBefore-} $flags"
-    elif [[ "$p" == "--append-flag" ]]; then
-      flags=${params[n + 1]@Q}
-      n=$((n + 1))
-      flagsAfter="${flagsAfter-} $flags"
-    elif [[ "$p" == "--add-flags" ]]; then
-      flags="${params[$((n + 1))]}"
-      n=$((n + 1))
-      flagsBefore="${flagsBefore-} $flags"
-    elif [[ "$p" == "--append-flags" ]]; then
-      flags="${params[$((n + 1))]}"
-      n=$((n + 1))
-      flagsAfter="${flagsAfter-} $flags"
-    elif [[ "$p" == "--argv0" ]]; then
-      argv0="${params[$((n + 1))]}"
-      n=$((n + 1))
-    elif [[ "$p" == "--inherit-argv0" ]]; then
-      # Whichever comes last of --argv0 and --inherit-argv0 wins
-      argv0='$0'
-    elif [[ "$p" == "--resolve-argv0" ]]; then
-      # this is noop in shell wrappers, since bash will always resolve $0
-      resolve_argv0=1
-    else
-      die "makeWrapper doesn't understand the arg $p"
-    fi
+      ;;
+      --suffix-each|--prefix-each)
+        varName="${params[$((n + 1))]}"
+        separator="${params[$((n + 2))]}"
+        values="${params[$((n + 3))]}"
+        n=$((n + 3))
+        for value in $values; do
+          addValue "$p" "$varName" "$separator" "$value"
+        done
+      ;;
+      --suffix-contents|--prefix-contents)
+        varName="${params[$((n + 1))]}"
+        separator="${params[$((n + 2))]}"
+        fileNames="${params[$((n + 3))]}"
+        n=$((n + 3))
+        for fileName in $fileNames; do
+          contents="$(cat "$fileName")"
+          addValue "$p" "$varName" "$separator" "$contents"
+        done
+      ;;
+      --add-flag)
+        flags=${params[n + 1]@Q}
+        n=$((n + 1))
+        flagsBefore="${flagsBefore-} $flags"
+      ;;
+      --append-flag)
+        flags=${params[n + 1]@Q}
+        n=$((n + 1))
+        flagsAfter="${flagsAfter-} $flags"
+      ;;
+      --add-flags)
+        flags="${params[$((n + 1))]}"
+        n=$((n + 1))
+        flagsBefore="${flagsBefore-} $flags"
+      ;;
+      --append-flags)
+        flags="${params[$((n + 1))]}"
+        n=$((n + 1))
+        flagsAfter="${flagsAfter-} $flags"
+      ;;
+      --argv0)
+        argv0="${params[$((n + 1))]}"
+        n=$((n + 1))
+      ;;
+      --inherit-argv0)
+        # Whichever comes last of --argv0 and --inherit-argv0 wins
+        argv0='$0'
+      ;;
+      --resolve-argv0)
+        # this is noop in shell wrappers, since bash will always resolve $0
+        resolve_argv0=1
+      ;;
+      *)
+        die "makeWrapper doesn't understand the arg $p"
+      ;;
+    esac
   done
 
   printf 'exec ' >>"$wrapper"
