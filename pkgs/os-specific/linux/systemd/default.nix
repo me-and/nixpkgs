@@ -240,6 +240,9 @@ stdenv.mkDerivation (finalAttrs: {
   ]
   ++ lib.optionals (stdenv.hostPlatform.isLinux && stdenv.hostPlatform.isGnu) [
     ./0006-timesyncd-disable-NSCD-when-DNSSEC-validation-is-dis.patch
+  ]
+  ++ [
+    ./0007-core-timer-fix-RandomizedOffsetSec-skipping-activations-after-persistent-catch-up.patch
   ];
 
   postPatch = ''
