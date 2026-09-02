@@ -190,6 +190,7 @@ in
               '';
               example = {
                 OnCalendar = "00:05";
+                RandomizedOffsetSec = "1d";
                 RandomizedDelaySec = "5h";
                 Persistent = true;
               };
@@ -340,6 +341,7 @@ in
         ];
         timerConfig = {
           OnCalendar = "00:05";
+          RandomizedOffsetSec = "1h";
           RandomizedDelaySec = "5h";
         };
       };

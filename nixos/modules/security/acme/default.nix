@@ -354,8 +354,7 @@ let
           # the course of the day to avoid rate limits.
           AccuracySec = "${toString (_24hSecs / numCerts)}s";
           # Skew randomly within the day, per https://letsencrypt.org/docs/integration-guide/.
-          RandomizedDelaySec = data.renewJitter;
-          FixedRandomDelay = true;
+          RandomizedOffsetSec = data.renewJitter;
         };
       };
 
@@ -693,7 +692,7 @@ let
           description = ''
             Maximum jitter applied to a timer to stretch its execution
             intervals to prevent multiple timers from firing simultaneously. See
-            `RandomizedDelaySecs=` in {manpage}`systemd.timer(5)`.
+            `RandomizedOffsetSecs=` in {manpage}`systemd.timer(5)`.
           '';
         };
 

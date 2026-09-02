@@ -14,13 +14,26 @@ in
       };
 
       dates = lib.mkOption {
-        default = [ "03:45" ];
+        default = [ "daily" ];
         apply = lib.toList;
+        example = "03:45";
         type = with lib.types; either singleLineStr (listOf str);
         description = ''
           Specification (in the format described by
           {manpage}`systemd.time(7)`) of the time at
           which the optimiser will run.
+        '';
+      };
+
+      randomizedOffsetSec = lib.mkOption {
+        default = "1d";
+        type = lib.types.singleLineStr; # TODO lies
+        example = "45min";
+        description = ''
+          Add a randomized offset that will be applied to each time in the
+          `dates` configuration to determine when the optimizer will run.  The
+          delay will be chosen between zero and this value.  This value must be
+          a timespan in the format specified by {manpage}`systemd.time(7)`.
         '';
       };
 
@@ -83,6 +96,7 @@ in
 
       timers.nix-optimise = lib.mkIf cfg.automatic {
         timerConfig = {
+          RandomizedOffsetSec = cfg.randomizedOffsetSec;
           RandomizedDelaySec = cfg.randomizedDelaySec;
           Persistent = cfg.persistent;
         };

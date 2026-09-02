@@ -538,6 +538,18 @@ in
         '';
       };
 
+      randomizedOffsetSec = lib.mkOption {
+        default = "7d";
+        type = lib.types.str;
+        example = "24h";
+        description = ''
+          Add a randomized offset from the given interval to each ZFS trim.
+          The offset will be chosen between zero and this value.  This value
+          must be a time span in the format specified by
+          {manpage}`systemd.time(7)`.
+        '';
+      };
+
       randomizedDelaySec = lib.mkOption {
         default = "6h";
         type = lib.types.str;

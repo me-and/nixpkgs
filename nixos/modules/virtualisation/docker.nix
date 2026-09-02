@@ -187,7 +187,7 @@ in
         '';
       };
 
-      randomizedDelaySec = mkOption {
+      randomizedOffsetSec = mkOption {
         default = "0";
         type = types.singleLineStr;
         example = "45min";
@@ -208,10 +208,8 @@ in
           unit was last triggered is stored on disk. When the timer is
           activated, the service unit is triggered immediately if it
           would have been triggered at least once during the time when
-          the timer was inactive. Such triggering is nonetheless
-          subject to the delay imposed by RandomizedDelaySec=. This is
-          useful to catch up on missed runs of the service when the
-          system was powered down.
+          the timer was inactive.  This is useful to catch up on missed
+          runs of the service when the system was powered down.
         '';
       };
 
@@ -260,6 +258,7 @@ in
       [ "virtualisation" "docker" "liveRestore" ]
       [ "virtualisation" "docker" "daemon" "settings" "live-restore" ]
     )
+    # TODO Add something here
   ];
 
   ###### implementation
@@ -374,7 +373,7 @@ in
 
       systemd.timers.docker-prune = mkIf cfg.autoPrune.enable {
         timerConfig = {
-          RandomizedDelaySec = cfg.autoPrune.randomizedDelaySec;
+          RandomizedOffsetSec = cfg.autoPrune.randomizedOffsetSec;
           Persistent = cfg.autoPrune.persistent;
         };
       };

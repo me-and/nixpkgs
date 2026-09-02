@@ -92,8 +92,8 @@ in
 
       dates = lib.mkOption {
         type = lib.types.str;
-        default = "04:40";
-        example = "daily";
+        default = "daily";
+        example = "04:00";
         description = ''
           How often or when upgrade occurs. For most desktop and server systems
           a sufficient upgrade frequency is once a day.
@@ -111,6 +111,18 @@ in
           if the new generation uses a different kernel, kernel modules
           or initrd than the booted system.
           See {option}`rebootWindow` for configuring the times at which a reboot is allowed.
+        '';
+      };
+
+      randomizedOffsetSec = lib.mkOption {
+        default = "1d";
+        type = lib.types.str;  # TODO No it isn't
+        example = "45min";
+        description = ''
+          Add a stable random offset from the specified automatic upgrade
+          schedule.  The offset will be chosen between zero and this value.
+          This value must be a time span in the format specified by
+          {manpage}`systemd.time(7)`.
         '';
       };
 
@@ -319,6 +331,7 @@ in
 
     systemd.timers.nixos-upgrade = {
       timerConfig = {
+        RandomizedOffsetSec = cfg.randomizedOffsetSec;
         RandomizedDelaySec = cfg.randomizedDelaySec;
         FixedRandomDelay = cfg.fixedRandomDelay;
         Persistent = cfg.persistent;

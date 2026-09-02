@@ -21,7 +21,7 @@ in
       dates = lib.mkOption {
         type = with lib.types; either singleLineStr (listOf str);
         apply = lib.toList;
-        default = [ "03:15" ];
+        default = [ "daily" ];
         example = "weekly";
         description = ''
           How often or when garbage collection is performed. For most desktop and server systems
@@ -29,6 +29,18 @@ in
 
           This value must be a calendar event in the format specified by
           {manpage}`systemd.time(7)`.
+        '';
+      };
+
+      randomizedOffsetSec = lib.mkOption {
+        default = "1d";
+        type = lib.types.singleLineStr; # TODO
+        example = "45min";
+        description = ''
+          Add a fixed randomized offset from the time specified using `dates`
+          to determine when garbage collection should run.  The delay will be
+          chosen between zero and this value.  This value must be a timespan in
+          the format specified by {manpage}`systemd.time(7)`.
         '';
       };
 
@@ -94,6 +106,7 @@ in
 
     systemd.timers.nix-gc = lib.mkIf cfg.automatic {
       timerConfig = {
+        RandomizedOffsetSec = cfg.randomizedOffsetSec;
         RandomizedDelaySec = cfg.randomizedDelaySec;
         Persistent = cfg.persistent;
       };

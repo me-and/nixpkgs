@@ -136,9 +136,11 @@
             systemd.timers."acme-renew-zeroconf3.${domain}".timerConfig = {
               OnCalendar = lib.mkForce "*-*-* *:*:0/5";
               AccuracySec = lib.mkForce 0;
-              # Skew randomly within the day, per https://letsencrypt.org/docs/integration-guide/.
+              # Normally we skew randomly within the day per
+              # https://letsencrypt.org/docs/integration-guide/, but that makes
+              # testing more complex, so override the normal randomization.
               RandomizedDelaySec = lib.mkForce 0;
-              FixedRandomDelay = lib.mkForce 0;
+              RandomizedOffsetSec = lib.mkForce 0;
             };
           };
         };
