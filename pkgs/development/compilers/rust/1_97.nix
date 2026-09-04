@@ -18,6 +18,7 @@
   lib,
   newScope,
   callPackage,
+  gitMinimal,
   pkgsBuildTarget,
   pkgsBuildBuild,
   pkgsBuildHost,

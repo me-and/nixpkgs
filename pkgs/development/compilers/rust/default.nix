@@ -18,6 +18,7 @@
   lib,
   newScope,
   callPackage,
+  gitMinimal,
   pkgsBuildBuild,
   pkgsBuildHost,
   pkgsBuildTarget,
@@ -66,11 +67,23 @@ in
   # anything provided prebuilt or their build-time dependencies to break
   # cycles / purify builds). In this way, nixpkgs would be in control of all
   # bootstrapping.
-  packages = {
+  packages = rec {
     prebuilt = callPackage ./bootstrap.nix {
       version = bootstrapVersion;
       hashes = bootstrapHashes;
     };
+
+    # Git is built with Rust, and fetchCargoVendor needs Git because it runs
+    # nix-prefetch-git, so bootstrapping Rust needs a Git that does not depend
+    # on the from-source toolchain.  Like `prebuilt`, this only exists to break
+    # that cycle, and nothing in the final package set should refer to it.
+    gitMinimalBootstrap = gitMinimal.override {
+      inherit (prebuilt) cargo rustc;
+      # The test suite is slow and pulls in yet more bootstrap dependencies; the
+      # regular gitMinimal build still runs it.
+      doInstallCheck = false;
+    };
+
     stable = lib.makeScope newScope (
       self:
       let
@@ -83,8 +96,12 @@ in
           else
             self.buildRustPackages.overrideScope (
               _: _:
-              lib.optionalAttrs (stdenv.buildPlatform == stdenv.hostPlatform)
-                (selectRustPackage pkgsBuildHost).packages.prebuilt
+              lib.optionalAttrs (stdenv.buildPlatform == stdenv.hostPlatform) (
+                let
+                  bootPackages = (selectRustPackage pkgsBuildHost).packages;
+                in
+                bootPackages.prebuilt // { gitMinimal = bootPackages.gitMinimalBootstrap; }
+              )
             );
         bootRustPlatform = makeRustPlatform bootstrapRustPackages;
       in
