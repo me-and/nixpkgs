@@ -314,170 +314,35 @@ let
     ''}
   '';
 
-  # The EFI boot image.
-  # Notes about grub:
-  #  * Yes, the grubMenuCfg has to be repeated in all submenus. Otherwise you
-  #    will get white-on-black console-like text on sub-menus. *sigh*
+  # The EFI boot image, as a Unified Kernel Image (UKI).
+  #
+  # A UKI is a single PE binary embedding the systemd-stub, kernel, initrd,
+  # and kernel command line as PE sections.  The UEFI firmware loads it via
+  # EFI_SIMPLE_FILE_SYSTEM_PROTOCOL and calls its entry point; after that the
+  # stub boots the kernel entirely from memory — no further file system access
+  # is required.
+  #
+  # This is necessary for the Toshiba Portege R30-A-1CP whose firmware only
+  # exposes EFI/BOOT/ (the directory the bootloader was loaded from) via
+  # EFI_SIMPLE_FILE_SYSTEM_PROTOCOL and does not expose the USB drive at all
+  # via EFI_BLOCK_IO_PROTOCOL.  systemd-boot needs loader/entries/ at the
+  # partition root, which the firmware never provides.
   efiDir =
     pkgs.runCommand "efi-directory"
       {
-        nativeBuildInputs = [ pkgs.buildPackages.grub2_efi ];
+        nativeBuildInputs = [ pkgs.buildPackages.systemdUkify ];
         strictDeps = true;
       }
       ''
         mkdir -p $out/EFI/BOOT
 
-        # Add a marker so GRUB can find the filesystem.
-        touch $out/EFI/nixos-installer-image
-
-        # ALWAYS required modules.
-        MODULES=(
-          # Basic modules for filesystems and partition schemes
-          "fat"
-          "iso9660"
-          "part_gpt"
-          "part_msdos"
-
-          # Basic stuff
-          "normal"
-          "boot"
-          "linux"
-          "configfile"
-          "loopback"
-          "chain"
-          "halt"
-
-          # Allows rebooting into firmware setup interface
-          "efifwsetup"
-
-          # EFI Graphics Output Protocol
-          "efi_gop"
-
-          # User commands
-          "ls"
-
-          # System commands
-          "search"
-          "search_label"
-          "search_fs_uuid"
-          "search_fs_file"
-          "echo"
-
-          # We're not using it anymore, but we'll leave it in so it can be used
-          # by user, with the console using "C"
-          "serial"
-
-          # Graphical mode stuff
-          "gfxmenu"
-          "gfxterm"
-          "gfxterm_background"
-          "test"
-          "loadenv"
-          "all_video"
-          "videoinfo"
-
-          # File types for graphical mode
-          "png"
-        )
-
-        echo "Building GRUB with modules:"
-        for mod in ''${MODULES[@]}; do
-          echo " - $mod"
-        done
-
-        # Modules that may or may not be available per-platform.
-        echo "Adding additional modules:"
-        for mod in efi_uga; do
-          if [ -f ${grubPkgs.grub2_efi}/lib/grub/${grubPkgs.grub2_efi.grubTarget}/$mod.mod ]; then
-            echo " - $mod"
-            MODULES+=("$mod")
-          fi
-        done
-
-        # Make our own efi program, we can't rely on "grub-install" since it seems to
-        # probe for devices, even with --skip-fs-probe.
-        grub-mkimage \
-          --directory=${grubPkgs.grub2_efi}/lib/grub/${grubPkgs.grub2_efi.grubTarget} \
-          -o $out/EFI/BOOT/BOOT${lib.toUpper targetArch}.EFI \
-          -p /EFI/BOOT \
-          -O ${grubPkgs.grub2_efi.grubTarget} \
-          ''${MODULES[@]}
-        cp ${grubPkgs.grub2_efi}/share/grub/unicode.pf2 $out/EFI/BOOT/
-
-        cat <<EOF > $out/EFI/BOOT/grub.cfg
-
-        set timeout=${toString grubEfiTimeout}
-
-        clear
-        # This message will only be viewable on the default (UEFI) console.
-        echo ""
-        echo "Loading graphical boot menu..."
-        echo ""
-        echo "Press 't' to use the text boot menu on this console..."
-        echo ""
-
-        ${grubMenuCfg}
-
-        # If the parameter iso_path is set, append the findiso parameter to the kernel
-        # line. We need this to allow the nixos iso to be booted from grub directly.
-        if [ \''${iso_path} ] ; then
-          set isoboot="findiso=\''${iso_path}"
-        fi
-
-        #
-        # Menu entries
-        #
-
-        ${buildMenuGrub2 { }}
-        submenu "Options" --class submenu --class hidpi {
-          ${grubMenuCfg}
-
-          ${lib.concatMapStringsSep "\n" (
-            {
-              title,
-              class,
-              params,
-            }:
-            ''
-              submenu "${title}" --class ${class} {
-                ${grubMenuCfg}
-                ${buildMenuGrub2 { inherit params; }}
-              }
-            ''
-          ) optionsSubMenus}
-        }
-
-        ${lib.optionalString (refindBinary != null) ''
-          # GRUB apparently cannot do "chainloader" operations on "CD".
-          if [ "\$root" != "cd0" ]; then
-            menuentry 'rEFInd' --class refind {
-              # Force root to be the FAT partition
-              # Otherwise it breaks rEFInd's boot
-              search --set=root --no-floppy --fs-uuid 1234-5678
-              chainloader (\$root)/EFI/BOOT/${refindBinary}
-            }
-          fi
-        ''}
-        ${lib.optionalString config.boot.loader.grub.memtest86.enable ''
-          menuentry 'Memtest86+' --class debug {
-            linux (\$root)/boot/memtest.bin ${toString config.boot.loader.grub.memtest86.params}
-          }
-        ''}
-        menuentry 'Firmware Setup' --class settings {
-          fwsetup
-          clear
-          echo ""
-          echo "If you see this message, your EFI system doesn't support this feature."
-          echo ""
-        }
-        menuentry 'Shutdown' --class shutdown {
-          halt
-        }
-        EOF
-
-        grub-script-check $out/EFI/BOOT/grub.cfg
-
-        ${refind}
+        ukify build \
+          --stub=${pkgs.systemd}/lib/systemd/boot/efi/linux${targetArch}.efi.stub \
+          --linux="${config.boot.kernelPackages.kernel}/${config.system.boot.loader.kernelFile}" \
+          --initrd="${config.system.build.initialRamdisk}/${config.system.boot.loader.initrdFile}" \
+          --cmdline="init=${config.system.build.toplevel}/init ${toString config.boot.kernelParams}" \
+          --os-release=@${config.system.build.etc}/etc/os-release \
+          --output=$out/EFI/BOOT/BOOT${lib.toUpper targetArch}.EFI
       '';
 
   efiImg =
@@ -494,8 +359,7 @@ let
       #   dates (cp -p, touch, mcopy -m, faketime for label), IDs (mkfs.vfat -i)
       ''
         mkdir ./contents && cd ./contents
-        mkdir -p ./EFI/BOOT
-        cp -rp "${efiDir}"/EFI/BOOT/{grub.cfg,*.EFI,*.efi} ./EFI/BOOT
+        cp -rp "${efiDir}"/. .
 
         # Rewrite dates for everything in the FS
         find . -exec touch --date=2000-01-01 {} +
@@ -513,11 +377,11 @@ let
         mkfs.vfat --invariant -i 12345678 -n EFIBOOT "$out"
 
         # Force a fixed order in mcopy for better determinism, and avoid file globbing
-        for d in $(find EFI -type d | sort); do
+        for d in $(find . -mindepth 1 -type d | sed 's|^\./||' | sort); do
           faketime "2000-01-01 00:00:00" mmd -i "$out" "::/$d"
         done
 
-        for f in $(find EFI -type f | sort); do
+        for f in $(find . -type f | sed 's|^\./||' | sort); do
           mcopy -pvm -i "$out" "$f" "::/$f"
         done
 
@@ -876,7 +740,6 @@ in
       grubPkgs.grub2
     ]
     ++ lib.optional (config.isoImage.makeBiosBootable) pkgs.syslinux;
-    system.extraDependencies = [ grubPkgs.grub2_efi ];
 
     # In stage 1 of the boot, mount the CD as the root FS by label so
     # that we don't need to know its device.  We pass the label of the
@@ -1005,24 +868,10 @@ in
           target = "/EFI/BOOT/efi-background.png";
         }
       ]
-      ++ lib.optionals (config.isoImage.makeEfiBootable && !config.boot.initrd.systemd.enable) [
-        # http://www.supergrubdisk.org/wiki/Loopback.cfg
-        # This feature will be removed, and thus is not supported by systemd initrd
-        {
-          source = (pkgs.writeTextDir "grub/loopback.cfg" "source /EFI/BOOT/grub.cfg") + "/grub";
-          target = "/boot/grub";
-        }
-      ]
       ++ lib.optionals (config.boot.loader.grub.memtest86.enable && config.isoImage.makeBiosBootable) [
         {
           source = pkgs.memtest86plus.efi;
           target = "/boot/memtest.bin";
-        }
-      ]
-      ++ lib.optionals (config.isoImage.grubTheme != null) [
-        {
-          source = config.isoImage.grubTheme;
-          target = "/EFI/BOOT/grub-theme";
         }
       ];
 
