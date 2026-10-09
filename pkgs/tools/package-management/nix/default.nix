@@ -214,12 +214,12 @@ lib.makeExtensible (
           src = fetchFromGitHub {
             owner = "NixOS";
             repo = "nix";
-            rev = "203f85b2e851fc52e253e8e33eff5fb92936736a";
-            hash = "sha256-ahm58Y+ASv19VGVzC2IwNsQpkVR8rgEwwHDYwnMadkI=";
+            rev = "81da9300cb4d232e254dff4f366caaceec1d3723";
+            hash = "sha256-e0S5zyurF5dT+4t9Czal5DaOjIeUHeZU+Ke/6tdQEj8=";
           };
         in
         (nixDependencies.callPackage ./modular/packages.nix {
-          version = "2.36pre20260912_${lib.substring 0 8 src.rev}";
+          version = "2.36pre20261008_${lib.substring 0 8 src.rev}";
           inherit teams;
           otherSplices = generateSplicesForNixComponents "nixComponents_git";
           src = removeFunctionalTests commonDisabledTests src;
