@@ -41,14 +41,7 @@
   udevCheckHook,
   z3,
   nix-update-script,
-  wxGTK-override ? null,
-  opencascade-override ? null,
 }:
-let
-  wxGTK-override' = if wxGTK-override == null then wxwidgets_3_2 else wxGTK-override;
-  opencascade-override' =
-    if opencascade-override == null then opencascade-occt_7_6_1 else opencascade-override;
-in
 clangStdenv.mkDerivation (finalAttrs: {
   pname = "prusa-slicer";
   version = "2.9.6";
@@ -104,7 +97,7 @@ clangStdenv.mkDerivation (finalAttrs: {
     cmake
     pkg-config
     wrapGAppsHook3
-    wxGTK-override'
+    wxwidgets_3_2
     udevCheckHook
   ];
 
@@ -128,11 +121,11 @@ clangStdenv.mkDerivation (finalAttrs: {
     mpfr
     nanosvg-fltk
     nlopt
-    opencascade-override'
+    opencascade-occt_7_6_1
     openvdb
     qhull
     onetbb
-    wxGTK-override'
+    wxwidgets_3_2
     libx11
     libbgcode
     heatshrink
